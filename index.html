@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Document</title>
+  <link rel="stylesheet" href="./example/example.css">
+</head>
+<body>
+  <button id="uploader-button" class="example-button">点击上传</button>
+  <div id="filelist" class="example-list"></div>
+  <script src="dist/uploader.js"></script>
+  <script>
+  var UPLOADER_PATH = 'http://localhost:8080/upload'
+  var uploader = new Uploader({
+    path: UPLOADER_PATH,
+    btnEl: document.getElementById('uploader-button'),
+    fileListEl: document.getElementById('filelist'),
+    env: 'webui', // webui > mobileui > websdk > mobilesdk
+    theme: 'default',
+    options: {
+      auto: false,
+      md5: true,
+      type: 'ws', // 'ws'>'http'>'flash'. default: 'ws'
+      queued: '2',
+      ticket: 'bearer bxxx'
+    }
+  })
+  </script>
+</body>
+</html>
