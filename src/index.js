@@ -1,8 +1,7 @@
-import './assets/less/common.less'
+// import './assets/less/common.less'
 
-import fetch from './assets/polyfills/fetch'
 import LOG from './logger.js'
-import WebUi from './uploader/webui'
+import WebUi from './ui/webui'
 
 const UI_TYPES = [
   'webui', // 带样式的web端文件上传
@@ -21,26 +20,42 @@ export default class Uploader {
    * @param { string } theme - 上传的主题标签
    * @param { object } options - 上传设置配置
    */
-  constructor ({ path, btnEl, fileListEl, env, theme, options }) {
-    if (!(btnEl instanceof HTMLElement)) {
-      LOG.error('FE1001')
+  constructor ({ path, btnEl, fileListEl, env, theme = 'default', options }) {
+    if (this.validate(env, btnEl, fileListEl)) {
+      this.env = env
+      this.btnEl = btnEl
+      this.fileListEl = fileListEl
+      this.path = path
+      this.options = options
+      this.theme = theme
+      this.handleUploader()
     }
-    if (!(fileListEl instanceof HTMLElement)) {
-      LOG.error('FE1002')
-    }
-    this.env = UI_TYPES.indexOf(env) === -1 ? 'webui' : env
-    this.btnEl = btnEl
-    this.fileListEl = fileListEl
-    this.path = path
-    this.options = options
   }
   handleUploader () {
     if (this.env === 'webui') {
-      this.uploader = new WebUi(this.btnEl, this.fileListEl)
+      this.uploader = new WebUi(this.btnEl, this.fileListEl, this.theme)
     }
   }
   start () {
     console.log('start')
-    fetch()
+  }
+  validate (env, ...arg) {
+    if (UI_TYPES.indexOf(env) === -1) {
+      LOG.error('FE1003')
+      return
+    }
+    if (env === 'webui') {
+      let btnEl = arg[0]
+      let fileListEl = arg[1]
+      if (!(btnEl instanceof HTMLElement)) {
+        LOG.error('FE1001')
+        return
+      }
+      if (!(fileListEl instanceof HTMLElement)) {
+        LOG.error('FE1002')
+        return
+      }
+    }
+    return true
   }
 }

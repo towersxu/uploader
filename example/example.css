@@ -1,5 +1,5 @@
 .example-button {
-  line-height: 1.5;
+  line-height: 32px;
   display: inline-block;
   font-weight: 400;
   text-align: center;
@@ -12,6 +12,8 @@
   padding: 0 15px;
   font-size: 14px;
   border-radius: 4px;
+  display: inline-block;
+  width: 100px;
   height: 32px;
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -24,6 +26,7 @@
   background-color: #fff;
   border-color: #d9d9d9;
   appearance: button;
+  /* box-sizing: border-box; */
 }
 .example-button,
 .example-button:active,
@@ -32,10 +35,5 @@
 }
 
 .example-list {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  width: 400px;
-  height: 300px;
-  display: none;
+
 }

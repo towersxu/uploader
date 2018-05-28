@@ -3,7 +3,9 @@ import babel from 'rollup-plugin-babel';
 import serve from 'rollup-plugin-serve';
 import livereload from 'rollup-plugin-livereload';
 import eslint from 'rollup-plugin-eslint';
-
+import nodeResolve from 'rollup-plugin-node-resolve';
+import commonjs from 'rollup-plugin-commonjs';
+let path = require('path');
 import {
   uglify
 } from 'rollup-plugin-uglify';
@@ -24,6 +26,10 @@ export default {
     postcss({
       plugins: []
     }),
+    nodeResolve({
+      module: true
+    }),
+    commonjs(),
     babel({
       exclude: 'node_modules/**'
     }),
@@ -31,5 +37,8 @@ export default {
     livereload({
       watch: 'dist'
     })
+  ],
+  external: [
+    path.resolve('./src/assets/font/test.js')
   ]
 }
