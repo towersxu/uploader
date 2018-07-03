@@ -8,7 +8,7 @@ export default {
       xhr.upload.onprogress = throttle(function (data) {
         if (xhr.readyState === 1) {
           let progress = Math.ceil(data.loaded / data.total * 100) + '%'
-          params.progress(progress)
+          params.progress(progress, data.loaded)
         }
       }, 200)
       xhr.upload.onloadstart = params.loadStart

@@ -51,10 +51,6 @@ class Uploader extends Events {
   constructor (file) {
     super()
     this.file = file
-    this.listeners = {
-      end: function () {},
-      progress: function () {}
-    }
   }
   start () {
     let form = new FormData()
@@ -62,8 +58,8 @@ class Uploader extends Events {
     form.append('attach', this.file)
     this.xhr = ajax.post('http://localhost:3000/upload', {
       data: form,
-      progress: (progress) => {
-        this.trigger('progress', progress)
+      progress: (progress, loaded) => {
+        this.trigger('progress', progress, loaded)
       },
       load: (data) => {
         this.trigger('end')

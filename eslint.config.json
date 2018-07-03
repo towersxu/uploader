@@ -9,7 +9,6 @@
     "keyword-spacing":2,
     "array-bracket-spacing": 0,
     "block-scoped-var": 0,
-    "brace-style": [2, "stroustrup", { "allowSingleLine": true }],
     "camelcase": 0,
     "comma-dangle": [2, "never"],
     "comma-spacing": [2, { "before": false, "after": true }],

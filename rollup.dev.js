@@ -29,16 +29,16 @@ export default {
     nodeResolve({
       module: true
     }),
-    commonjs(),
     babel({
       exclude: 'node_modules/**'
     }),
+    commonjs(),
     serve(), // index.html should be in root of project
     livereload({
       watch: 'dist'
     })
   ],
   external: [
-    path.resolve('./src/assets/font/test.js')
+    // path.resolve('./src/assets/test1.js')
   ]
 }

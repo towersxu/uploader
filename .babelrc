@@ -19,15 +19,22 @@
         "modules": false
       }
     ],
-    "stage-2"
+    "stage-3"
   ],
   "plugins": [
+    ["transform-decorators-legacy", {
+      "legacy": true
+    }],
+    [
+      "transform-class-properties", {
+        "spec": true
+      }
+    ],
     [
       "transform-es2015-classes",
       {
         "loose": true
       }
-    ],
-    "external-helpers"
+    ]
   ]
 }
