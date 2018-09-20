@@ -1,7 +1,7 @@
 {
   "name": "uploader",
   "version": "1.0.0",
-  "description": "乐知行公共上传插件",
+  "description": "上传插件",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
