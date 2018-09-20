@@ -1,5 +1,5 @@
 import Render from '../render'
-import FileSdk from '../sdk/file-sdk'
+import FileSdk from '../core/file-sdk'
 import Progress from './web/progress'
 import Header from './web/header'
 

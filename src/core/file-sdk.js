@@ -9,7 +9,7 @@
 // import ajax from '../assets/polyfills/ajax'
 import ajaxUploader from '../uploader/ajaxUploader'
 import Events from '../events'
-import md5 from './md5'
+import getFileMd5 from './md5'
 
 export default class FileSdk extends Events {
   constructor (file) {
@@ -17,11 +17,11 @@ export default class FileSdk extends Events {
     this.file = file
   }
   start () {
-    this.md5()
+    this.getFileMd5()
   }
-  md5 () {
+  getFileMd5 () {
     this.trigger('md5')
-    md5(this.file, () => {
+    getFileMd5(this.file, (md5) => {
       this.trigger('auth')
       setTimeout(() => {
         this.upload()
