@@ -17,19 +17,19 @@
     function cback () {
       console.log('cssss')
     }
-  	function _makeFlashHTML(opts){
-			return ('<object id="#id#" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="'+(opts.width || '100%')+'" height="'+(opts.height || '100%')+'">'
-				+ '<param name="movie" value="#src#" />'
-				+ '<param name="flashvars" value="#flashvars#" />'
-				+ '<param name="swliveconnect" value="true" />'
-				+ '<param name="allowscriptaccess" value="always" />'
-				+ '<param name="allownetworking" value="all" />'
-				+ '<param name="menu" value="false" />'
-				+ '<param name="wmode" value="#wmode#" />'
-				+ '<embed flashvars="#flashvars#" swliveconnect="true" allownetworking="all" allowscriptaccess="always" name="#id#" src="#src#" width="'+(opts.width || '100%')+'" height="'+(opts.height || '100%')+'" menu="false" wmode="transparent" type="application/x-shockwave-flash"></embed>'
-				+ '</object>').replace(/#(\w+)#/ig, function (a, name){ return opts[name]; })
-			;
-		}
+    function _makeFlashHTML (opts) {
+      return ('<object id="#id#" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="' + (opts.width || '100%') + '" height="' + (opts.height || '100%') + '">' +
+            '<param name="movie" value="#src#" />' +
+            '<param name="flashvars" value="#flashvars#" />' +
+            '<param name="swliveconnect" value="true" />' +
+            '<param name="allowscriptaccess" value="always" />' +
+            '<param name="allownetworking" value="all" />' +
+            '<param name="menu" value="false" />' +
+            '<param name="wmode" value="#wmode#" />' +
+            '<embed flashvars="#flashvars#" swliveconnect="true" allownetworking="all" allowscriptaccess="always" name="#id#" src="#src#" width="' + (opts.width || '100%') + '" height="' + (opts.height || '100%') + '" menu="false" wmode="transparent" type="application/x-shockwave-flash"></embed>' +
+            '</object>').replace(/#(\w+)#/ig, function (a, name) { return opts[name] })
+
+    }
     document.getElementById('flash-el').innerHTML = _makeFlashHTML({
       id: 'flash-el',
       src: './dist/FileAPI.flash.swf',
@@ -40,7 +40,7 @@
   <script src="dist/uploader.js"></script>
   <script>
   var UPLOADER_PATH = 'http://localhost:8080/upload'
-  var uploader = new Uploader({
+  var uploader = new window.Uploader({
     path: UPLOADER_PATH,
     btnEl: document.getElementById('uploader-button'),
     fileListEl: document.getElementById('filelist'),
@@ -54,6 +54,7 @@
       ticket: 'bearer bxxx'
     }
   })
+  console.log(uploader)
   </script>
 </body>
 </html>

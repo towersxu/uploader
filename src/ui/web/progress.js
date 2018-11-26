@@ -46,6 +46,9 @@ class ProgressBar extends UiComponents {
     this.ptools.on('pause', () => {
       console.log('pause')
     })
+    this.ptools.on('delete', () => {
+      console.log('delete')
+    })
   }
   setStatus (statu, data) {
     if (statu === 'auth') {

@@ -1,41 +1,27 @@
 {
   "presets": [
     [
-      "env",
-      {
-        "modules": false,
-        "targets": {
-          "browsers": [
-            "> 1%",
-            "last 2 versions",
-            "not ie <= 9"
-          ]
-        }
-      }
-    ],
-    [
-      "es2015",
-      {
-        "modules": false
-      }
-    ],
-    "stage-3"
+      "@babel/preset-react"
+    ]
   ],
   "plugins": [
-    ["transform-decorators-legacy", {
-      "legacy": true
-    }],
     [
-      "transform-class-properties", {
+      "@babel/plugin-proposal-decorators",
+      {
+        "legacy": true
+      }
+    ],
+    [
+      "@babel/plugin-proposal-class-properties",
+      {
         "spec": true
       }
     ],
     [
-      "transform-es2015-classes",
+      "@babel/plugin-transform-classes",
       {
         "loose": true
       }
-    ],
-    "external-helpers"
+    ]
   ]
 }

@@ -4,7 +4,10 @@ module.exports = {
   root: true,
   parser: 'babel-eslint',
   parserOptions: {
-    sourceType: 'module'
+    sourceType: 'module',
+    ecmaFeatures: {
+      legacyDecorators: true
+    }
   },
   extends: './eslint.config.json',
   // required to lint *.vue files
