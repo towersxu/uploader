@@ -2,6 +2,7 @@
 
 import LOG from './logger.js'
 import WebUi from './ui/webui'
+import config from './config'
 
 const UI_TYPES = [
   'webui', // 带样式的web端文件上传
@@ -10,17 +11,18 @@ const UI_TYPES = [
   'mobilesdk' // 无样式的mobile端文件上传
 ]
 
-export default class Uploader {
+export class Uploader {
   /**
    * 上传的构造函数
-   * @param { string } path - 上传路径
+   * @param { string } path - 后端上传配置路径
+   * @param { string } uploadPath - 文件服务器上传路径
    * @param { HTMLElement } btnEl - 上传元素
    * @param { HTMLElement } fileListEl - 显示上传进度的列表
    * @param { string } env - 上传插件的运行环境
    * @param { string } theme - 上传的主题标签
    * @param { object } options - 上传设置配置
    */
-  constructor ({ path, btnEl, fileListEl, env, theme = 'default', options }) {
+  constructor ({ path, uploadPath, btnEl, fileListEl, env, theme = 'default', options }) {
     if (this.validate(env, btnEl, fileListEl)) {
       this.env = env
       this.btnEl = btnEl
@@ -28,6 +30,8 @@ export default class Uploader {
       this.path = path
       this.options = options
       this.theme = theme
+      config.setBackendServerPath(path) 
+      config.setUploaderServerPath(uploadPath)
       this.handleUploader()
     }
   }
@@ -39,6 +43,11 @@ export default class Uploader {
   start () {
     console.log('start')
   }
+  /**
+   * 检验传入参数是否合法
+   * @param {string} env 运行环境
+   * @param  {...any} arg 参数
+   */
   validate (env, ...arg) {
     if (UI_TYPES.indexOf(env) === -1) {
       LOG.error('FE1003')

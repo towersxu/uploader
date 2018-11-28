@@ -56,7 +56,7 @@ class Uploader extends Events {
     let form = new FormData()
     form.append('Content-Type', 'application/octet-stream')
     form.append('attach', this.file)
-    this.xhr = ajax.post('http://localhost:4000/upload', {
+    this.xhr = ajax.postFile('http://localhost:4000/upload', {
       data: form,
       progress: (progress, loaded) => {
         this.trigger('progress', progress, loaded)

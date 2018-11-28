@@ -1,5 +1,5 @@
 export default {
-  post (url, params) {
+  postFile (url, params) {
     let xhr = _createXhr()
     xhr.open('POST', url)
     xhr.onprogress = params.progress
@@ -38,6 +38,54 @@ export default {
     xhr.send(params.data)
 
     return xhr
+  },
+  post(params) {
+    return new Promise((resolve, reject) => {
+      let xhr = _createXhr()
+      xhr.open('POST', params.url)
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            let res
+            try {
+              res = JSON.parse(xhr.responseText)
+            }
+            catch (e) {
+              res = xhr.responseText
+            }
+            resolve(res)
+          }
+          else {
+            reject(xhr.responseText)
+          }
+        }
+      }
+      xhr.send(JSON.stringify(params.data))
+    })
+  },
+  get(url) {
+    return new Promise((resolve, reject) => {
+      let xhr = _createXhr()
+      xhr.open('POST', url)
+      xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+          if (xhr.status >= 200 && xhr.status < 300) {
+            let res
+            try {
+              res = JSON.parse(xhr.responseText)
+            }
+            catch (e) {
+              res = xhr.responseText
+            }
+            resolve(res)
+          }
+          else {
+            reject(xhr.responseText)
+          }
+        }
+      }
+      xhr.send(params)
+    })
   }
 }
 

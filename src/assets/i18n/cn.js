@@ -5,6 +5,8 @@ export default {
   'FE1003': '未指明上传模式',
   'NW1001': '网络连接失败',
   'NW1002': '服务器地址错误',
+  'CF1001': '未配置认证服务地址',
+  'UPLOAD_HEADER': '选择文件',
   'UPLOADING': '正在上传',
   'UPLOADED': '上传完成'
 }

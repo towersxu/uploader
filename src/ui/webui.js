@@ -2,6 +2,8 @@ import Render from '../render'
 import FileSdk from '../core/file-sdk'
 import Progress from './web/progress'
 import Header from './web/header'
+import suffixUtil from '../utils/suffixUtil'
+import Events from '../events'
 
 export default class WebUi extends Render {
   constructor (btnEl, fileListEl, theme) {
@@ -13,7 +15,6 @@ export default class WebUi extends Render {
     this.progressEls = []
     this.fileListHeader = new Header(theme)
     this.progressEls.push(this.fileListHeader.getEl())
-    this.fileListHeader.setStatus(0)
     this.list = this.h(`div.${this.theme}-progress-list`, [])
     this.progressEls.push(this.list)
     this.fileListVnode = this.h(`div.${this.theme}-fileset`, this.progressEls)
@@ -47,12 +48,11 @@ export default class WebUi extends Render {
     // todo: IE9 无法获取file
     let files = []
     Array.prototype.map.call(e.target.files, (f) => {
-      if (/\.([a-zA-Z]+?)$/.test(f.name)) { // 只能上传带有后缀的文件
+      let suffix = suffixUtil.getSuffix(f.name)
+      if (suffix) { // 只能上传带有后缀的文件
         let fs = new FileSdk(f)
-        let suffix = RegExp.$1
         let progress = new Progress(this.theme, f.name, suffix, f.size)
         fs.on('progress', (data, loaded) => {
-          console.log(loaded)
           if (!loaded) {
             loaded = f.size
           }
@@ -87,6 +87,9 @@ export default class WebUi extends Render {
           size: f.size,
           suffix: suffix
         })
+      } else {
+        Events.trigger('error-info', `${f.name}是非法的文件`)
+        console.log(1)
       }
     })
     this.files = this.files.concat(files)

@@ -39,11 +39,14 @@
   </script>
   <script src="dist/uploader.js"></script>
   <script>
-  var UPLOADER_PATH = 'http://localhost:8080/upload'
+  var UPLOADER_PATH = 'http://localhost:4001/preupload'
   var uploader = new window.Uploader({
     path: UPLOADER_PATH,
+    uploadPath: 'http://localhost:4000/upload',
     btnEl: document.getElementById('uploader-button'),
     fileListEl: document.getElementById('filelist'),
+    accepts: 'images/*', // 可选，接收格式，如果
+    whiteSuffixList: ['png', 'gif', 'jpeg'], // 可上传图片的格式
     env: 'webui', // webui > mobileui > websdk > mobilesdk
     theme: 'default',
     options: {

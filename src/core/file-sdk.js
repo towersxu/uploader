@@ -8,6 +8,8 @@
  */
 // import ajax from '../assets/polyfills/ajax'
 import ajaxUploader from '../uploader/ajaxUploader'
+import ajax from '../assets/polyfills/ajax'
+import config from '../config'
 import Events from '../events'
 import getFileMd5 from './md5'
 
@@ -23,9 +25,22 @@ export default class FileSdk extends Events {
     this.trigger('md5')
     getFileMd5(this.file, (md5) => {
       this.trigger('auth')
-      setTimeout(() => {
+      ajax.post({
+        url: config.getBackendServerPath(),
+        data: {
+          hasMd5: true,
+          md5: md5,
+          fileFormat: 'png',
+          size: this.file.size,
+          fileName: this.file.name
+        }
+      })
+      .then((res) => {
         this.upload()
-      }, 3000)
+      })
+      .catch(e => {
+        console.log(e)
+      })
     })
   }
   upload () {
