@@ -17,14 +17,17 @@ export default class FileSdk extends Events {
   constructor (file) {
     super()
     this.file = file
+    this.statu = 'init'
   }
   start () {
+    this.statu = 'md5'
     this.getFileMd5()
   }
   getFileMd5 () {
-    this.trigger('md5')
+    this.trigger(this.statu)
     getFileMd5(this.file, (md5) => {
-      this.trigger('auth')
+      this.statu = 'auth'
+      this.trigger(this.statu)
       ajax.post({
         url: config.getBackendServerPath(),
         data: {
@@ -36,7 +39,9 @@ export default class FileSdk extends Events {
         }
       })
       .then((res) => {
-        this.upload()
+        this.statu = 'uploading'
+        this.trigger(this.statu)
+        this.upload(res)
       })
       .catch(e => {
         console.log(e)
@@ -46,10 +51,20 @@ export default class FileSdk extends Events {
   upload () {
     let uploader = ajaxUploader(this.file)
     uploader.on('progress', (data, loaded) => {
+      this.statu = 'progress'
       this.trigger('progress', data, loaded)
     })
     uploader.on('success', (data) => {
+      this.statu = 'success'
       this.trigger('success', data)
     })
+    uploader.on('abort', (data) => {
+      this.statu = 'abort'
+      this.trigger('abort', data)
+    })
+    this.uploader = uploader
+  }
+  getUploader () {
+    return this.uploader
   }
 }

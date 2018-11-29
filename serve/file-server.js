@@ -8,7 +8,6 @@ app.use(function (req, res, next) {
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
-  console.log(req.originalUrl)
   // intercept OPTIONS method
   if (req.method == 'OPTIONS' && req.originalUrl === '/upload') {
     res.sendStatus(200)
@@ -18,7 +17,6 @@ app.use(function (req, res, next) {
 })
 
 app.post('/upload', function (req, res) {
-  console.log('upload')
   let filename = ''
   let suffix = ''
   // create an incoming form object

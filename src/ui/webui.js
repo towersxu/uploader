@@ -11,6 +11,15 @@ export default class WebUi extends Render {
     this.btnEl = btnEl
     this.files = []
     // this.fileListId = fileListEl.getAttribute('id')
+    this.inputEl = this.h('input', {
+      props: {
+        type: 'file',
+        multiple: 'multiple'
+      },
+      on: {
+        change: this.fileChange.bind(this)
+      }
+    })
     this.resetUploadBtn()
     this.progressEls = []
     this.fileListHeader = new Header(theme)
@@ -31,15 +40,7 @@ export default class WebUi extends Render {
       }
     }, [
       this.toVNode(this.btnEl),
-      this.h('input', {
-        props: {
-          type: 'file',
-          multiple: 'multiple'
-        },
-        on: {
-          change: this.fileChange.bind(this)
-        }
-      })
+      this.inputEl
     ])
     this.patch(this.btnEl, nEl)
   }
@@ -78,6 +79,10 @@ export default class WebUi extends Render {
           // 2) 上传上传进度条
           // 3) 同步修改上传文件对象列表
           // fs.cancel()
+          let uploader = fs.getUploader()
+          if (uploader) {
+            uploader.abort()
+          }
         })
         fs.start()
         files.push({
@@ -88,12 +93,15 @@ export default class WebUi extends Render {
           suffix: suffix
         })
       } else {
-        Events.trigger('error-info', `${f.name}是非法的文件`)
-        console.log(1)
+        Events.trigger('error-info', `"${f.name}"没有文件名，不支持上传`)
       }
     })
     this.files = this.files.concat(files)
     this.handleFiles()
+    // 重置选择内容，解决无法两次选择同一个文件的问题
+    if (this.inputEl && this.inputEl.elm) {
+      this.inputEl.value = ''
+    }
   }
   handleFiles () {
     let allProgress = []

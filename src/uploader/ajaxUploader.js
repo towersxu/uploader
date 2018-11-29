@@ -77,7 +77,7 @@ class Uploader extends Events {
   }
   abort () {
     this.xhr.abort()
-    this.trigger('end')
+    this.trigger('abort')
   }
 }
 

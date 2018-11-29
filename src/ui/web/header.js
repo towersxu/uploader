@@ -8,7 +8,6 @@ export default class Header extends UiComponents {
     this.theme = theme
     this.setStatus(status)
     Events.on('error-info', (msg) => {
-      console.log('components error', msg)
       this.showError(msg)
     })
   }
@@ -40,9 +39,17 @@ export default class Header extends UiComponents {
     }
   }
   showError(text) {
+    // todo: 采用序列显示错误提示
     this.errorInfo = this.patch(this.errorInfo, this.getErrorVNode(text))
+    setTimeout(() => {
+      this.showError('')
+    }, 30000)
   }
   getErrorVNode (text) {
-    return this.h(`span.${this.theme}-header-error`, text)
+    return this.h(`span.${this.theme}-header-error`, {
+      props: {
+        title: text
+      }
+    }, text)
   }
 }

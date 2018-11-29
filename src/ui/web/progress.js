@@ -13,6 +13,12 @@ export default class Progress extends UiComponents {
     children.push(this.progressbar.getEl())
     children.push(this.progressbg.getEl())
     this.el = this.h(`div.${this.theme}-progress`, children)
+    // init listener
+    this.progressbar.on('delete', () => {
+      console.log(3)
+      this.trigger('delete')
+    })
+
   }
   setProgress (p, loaded) {
     this.progressbg.setProgress(p)
@@ -40,6 +46,7 @@ class ProgressBar extends UiComponents {
       this.size.getEl(),
       this.ptools.getEl()
     ])
+    this.handlePTools()
   }
   // 处理删除
   handlePTools () {
@@ -47,6 +54,7 @@ class ProgressBar extends UiComponents {
       console.log('pause')
     })
     this.ptools.on('delete', () => {
+      this.trigger('delete')
       console.log('delete')
     })
   }
@@ -188,6 +196,7 @@ class ProgressTools extends UiComponents {
    * 删除上传
    */
   deleteUpload () {
+    console.log(222)
     this.trigger('delete')
   }
   /**

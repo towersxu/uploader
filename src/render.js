@@ -21,7 +21,7 @@ export default class Render {
   }
   appendElTo () {}
   patch (oldVnode, newVnode) {
-    patch(oldVnode, newVnode)
+    return patch(oldVnode, newVnode)
   }
   h (...arg) {
     return h(...arg)
