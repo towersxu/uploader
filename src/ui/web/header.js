@@ -7,7 +7,7 @@ export default class Header extends UiComponents {
     super()
     this.theme = theme
     this.setStatus(status)
-    Events.on('error-info', (msg) => {
+    Events.on('HEADER:ERROR_TEXT', (msg) => {
       this.showError(msg)
     })
   }
@@ -43,7 +43,7 @@ export default class Header extends UiComponents {
     this.errorInfo = this.patch(this.errorInfo, this.getErrorVNode(text))
     setTimeout(() => {
       this.showError('')
-    }, 30000)
+    }, 3000)
   }
   getErrorVNode (text) {
     return this.h(`span.${this.theme}-header-error`, {

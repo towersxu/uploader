@@ -8,10 +8,10 @@
  */
 // import ajax from '../assets/polyfills/ajax'
 import ajaxUploader from '../uploader/ajaxUploader'
-import ajax from '../assets/polyfills/ajax'
-import config from '../config'
 import Events from '../events'
 import getFileMd5 from './md5'
+import auth from './auth'
+import section from './section'
 
 export default class FileSdk extends Events {
   constructor (file) {
@@ -21,32 +21,35 @@ export default class FileSdk extends Events {
   }
   start () {
     this.statu = 'md5'
-    this.getFileMd5()
+    this._getFileMd5()
   }
-  getFileMd5 () {
+  /**
+   * 获取文件M5
+   */
+  _getFileMd5 () {
     this.trigger(this.statu)
-    getFileMd5(this.file, (md5) => {
-      this.statu = 'auth'
-      this.trigger(this.statu)
-      ajax.post({
-        url: config.getBackendServerPath(),
-        data: {
-          hasMd5: true,
-          md5: md5,
-          fileFormat: 'png',
-          size: this.file.size,
-          fileName: this.file.name
-        }
+    getFileMd5(this.file)
+      .then(this._auth.bind(this))
+  }
+  /**
+   * 获取用户认证
+   * @param {string} md5 
+   */
+  _auth (md5) {
+    this.statu = 'auth'
+    this.trigger(this.statu)
+    auth(md5, this.file.size, this.file.name)
+      .then(this._section.bind(this))
+  }
+  /**
+   * 获取文件的一部分
+   * @param {object} res 认证返回的对象
+   */
+  _section (res) {
+    section(this.file, 0, 1000)
+      .then((blob) => {
+        console.log(blob)
       })
-      .then((res) => {
-        this.statu = 'uploading'
-        this.trigger(this.statu)
-        this.upload(res)
-      })
-      .catch(e => {
-        console.log(e)
-      })
-    })
   }
   upload () {
     let uploader = ajaxUploader(this.file)

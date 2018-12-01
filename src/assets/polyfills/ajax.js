@@ -43,6 +43,7 @@ export default {
     return new Promise((resolve, reject) => {
       let xhr = _createXhr()
       xhr.open('POST', params.url)
+      xhr.setRequestHeader('Content-Type', 'application/json')
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
           if (xhr.status >= 200 && xhr.status < 300) {

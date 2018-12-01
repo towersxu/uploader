@@ -2,7 +2,7 @@ import Render from '../render'
 import FileSdk from '../core/file-sdk'
 import Progress from './web/progress'
 import Header from './web/header'
-import suffixUtil from '../utils/suffixUtil'
+import toolsUtil from '../utils/toolsUtil'
 import Events from '../events'
 
 export default class WebUi extends Render {
@@ -49,7 +49,7 @@ export default class WebUi extends Render {
     // todo: IE9 无法获取file
     let files = []
     Array.prototype.map.call(e.target.files, (f) => {
-      let suffix = suffixUtil.getSuffix(f.name)
+      let suffix = toolsUtil.getSuffix(f.name)
       if (suffix) { // 只能上传带有后缀的文件
         let fs = new FileSdk(f)
         let progress = new Progress(this.theme, f.name, suffix, f.size)
@@ -93,7 +93,7 @@ export default class WebUi extends Render {
           suffix: suffix
         })
       } else {
-        Events.trigger('error-info', `"${f.name}"没有文件名，不支持上传`)
+        Events.trigger('HEADER:ERROR_TEXT', `"${f.name}"${this.i18n('FV1001')}`)
       }
     })
     this.files = this.files.concat(files)

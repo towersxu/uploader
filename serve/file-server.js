@@ -3,8 +3,17 @@ const path = require('path')
 const app = express()
 const formidable = require('formidable')
 const fs = require('fs')
+const only = require('only');
+const uuid = require('./uuid')
+const bodyParser = require('body-parser')
+
+app.use(bodyParser.json())       // to support JSON-encoded bodies
+app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
+  extended: true
+}))
 
 app.use(function (req, res, next) {
+  console.log(1111)
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
@@ -14,6 +23,17 @@ app.use(function (req, res, next) {
   } else {
     next()
   }
+})
+
+app.post('/upload/checkFileMd5', function (req, res) {
+  let data = only(req.body, 'md5 hasMd5 userId moduleKey size bussinessId fileName fileFormat')
+  console.log(data)
+  let uid = uuid()
+  res.json({
+    code: 0,
+    data: [],
+    token: uid
+  })
 })
 
 app.post('/upload', function (req, res) {
