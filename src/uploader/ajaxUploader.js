@@ -54,15 +54,19 @@ class Uploader extends Events {
     this.data = data
   }
   start () {
-    console.log('start....')
     let form = new FormData()
     form.append('Content-Type', 'application/octet-stream')
     Object.keys(this.data).map((key) => {
-      form.append(key, this.data[key])
+      if (!/^_/.test(key)) {
+        form.append(key, this.data[key])
+      }
     })
     this.xhr = ajax.postFile(config.getUploaderServerPath(), {
       data: form,
       progress: (progress, loaded) => {
+        if (progress === '100%') {
+          loaded = this.data.chunkSize
+        }
         this.trigger('progress', progress, loaded)
       },
       load: (data) => {

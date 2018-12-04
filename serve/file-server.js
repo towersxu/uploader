@@ -69,7 +69,7 @@ app.post('/upload/fileUpload', upload.single('file'), function (req, res) {
     // todo: 各种校验
     let chunkIndex = Number(req.body.chunkIndex)
     if (conf.chunks.indexOf(chunkIndex) === -1) {
-      conf.chunks.push()
+      conf.chunks.push(chunkIndex)
       conf.chunkLength = req.body.chunkLength
       conf.chunkSize = req.body.chunkSize
       conf.size = req.body.size

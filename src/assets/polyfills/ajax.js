@@ -2,7 +2,7 @@ export default {
   postFile (url, params) {
     let xhr = _createXhr()
     xhr.open('POST', url)
-    xhr.onprogress = params.progress
+    // xhr.onprogress = params.progress
     xhr.onload = params.load
     if (xhr.upload && params.progress) {
       xhr.upload.onprogress = throttle(function (data) {

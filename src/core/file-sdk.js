@@ -22,11 +22,13 @@ export default class FileSdk extends Events {
       chunkSize: config.chunkSize, // 分片传输
       size: file.size,
       name: file.name,
-      chunkLength: Math.floor(file.size / config.chunkSize),
+      chunkLength: Math.ceil(file.size / config.chunkSize),
       chunkIndex: 0,
       MD5: '',
-      statu: config.UPLOAD_STATUS.INIT,
-      file: file
+      _file: file,
+      file: '',
+      _uploadSize: 0,
+      _progress: 0,
     }
   }
   start () {
@@ -37,7 +39,7 @@ export default class FileSdk extends Events {
    */
   _getFileMd5 () {
     this.trigger(config.UPLOAD_STATUS.MD5)
-    getFileMd5(this.fileInfo.file)
+    getFileMd5(this.fileInfo._file)
       .then(this._auth.bind(this))
   }
   /**
@@ -55,18 +57,40 @@ export default class FileSdk extends Events {
    * @param {object} res 认证返回的对象
    */
   _section () {
-    section(this.fileInfo.file, this.fileInfo.start, this.fileInfo.chunkSize)
+    section(this.fileInfo._file, this.fileInfo.start, this.fileInfo.chunkSize)
       .then((blob) => {
         this._uploadChunk(blob)
       })
   }
-  _uploadChunk (file) {
+  _uploadChunk (blob) {
     // 上传分片~
-    console.log("_uploadChunk_")
-    this.trigger(config.UPLOAD_STATUS.UPLOADING)
+    this.fileInfo.file = blob
     let uploader = uploadChunk(this.fileInfo)
+    uploader.on('progress', (progress, loaded) => {
+      this.fileInfo._progress = this.fileInfo.chunkIndex * this.fileInfo.chunkSize + loaded
+      this.trigger(
+        config.UPLOAD_STATUS.PROGRESS,
+        Math.ceil(this.fileInfo._progress / this.fileInfo.size * 100) + '%',
+        this.fileInfo._progress
+      )
+    })
+    uploader.on('success', (data) => {
+      if (this.fileInfo.chunkIndex < this.fileInfo.chunkLength - 1) {
+        this.fileInfo.start = (this.fileInfo.chunkIndex += 1) * this.fileInfo.chunkSize
+        this._section() 
+      } else {
+        this.trigger(
+          config.UPLOAD_STATUS.PROGRESS,
+          '100%',
+          this.fileInfo.size
+        )
+        this.trigger(
+          config.UPLOAD_STATUS.SUCCESS,
+          data
+        )
+      }
+    })
     uploader.start()
-    console.log('0000')
   }
   upload () {
     // let uploader = ajaxUploader(this.file)

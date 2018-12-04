@@ -7,7 +7,11 @@
 // todo: 队列处理
 export default function (blob, start, length) {
   return new Promise((resove) => {
-    var nb = blob.slice(start, start + length)
+    let end = start + length
+    if (end > blob.size) {
+      end = blob.size
+    }
+    var nb = blob.slice(start, end)
     resove(nb)
   })
 }

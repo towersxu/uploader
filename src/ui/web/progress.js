@@ -15,13 +15,19 @@ export default class Progress extends UiComponents {
     this.el = this.h(`div.${this.theme}-progress`, children)
     // init listener
     this.progressbar.on('delete', () => {
-      console.log(3)
       this.trigger('delete')
     })
 
   }
+  /**
+   * 设置上传的进度
+   * @param {string} p 百分比
+   * @param {number} loaded 数字，已上传的大小
+   */
   setProgress (p, loaded) {
+    // 设置背景
     this.progressbg.setProgress(p)
+    // 设置文字
     this.progressbar.setProgress(p, loaded)
   }
   setStatus (statu, data) {
@@ -64,6 +70,11 @@ class ProgressBar extends UiComponents {
     }
     this.ptools.setStatus(statu, data)
   }
+  /**
+   * 设置已上传的大小
+   * @param {string} p 进度，
+   * @param {number} loaded 已上传内容的大小
+   */
   setProgress (p, loaded) {
     this.size.setStatus(2, loaded)
   }
@@ -103,6 +114,10 @@ class FileSizeEl extends UiComponents {
       this.p
     ])
   }
+  /**
+   * 设置上传的进度-文字
+   * @param {number} size 已经上传的进度
+   */
   setProgress (size) {
     if (typeof size === 'number') {
       size = calcSize(size)
