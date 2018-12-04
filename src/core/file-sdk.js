@@ -7,28 +7,37 @@
  * 4）上传文件 - trans.js(队列处理)
  */
 // import ajax from '../assets/polyfills/ajax'
-import ajaxUploader from '../uploader/ajaxUploader'
+import { uploadChunk } from '../uploader/ajaxUploader'
 import Events from '../events'
 import getFileMd5 from './md5'
 import auth from './auth'
 import section from './section'
+import config from '../config'
 
 export default class FileSdk extends Events {
   constructor (file) {
     super()
-    this.file = file
-    this.statu = 'init'
+    this.fileInfo = {
+      start: 0, // 上传文件当前序号
+      chunkSize: config.chunkSize, // 分片传输
+      size: file.size,
+      name: file.name,
+      chunkLength: Math.floor(file.size / config.chunkSize),
+      chunkIndex: 0,
+      MD5: '',
+      statu: config.UPLOAD_STATUS.INIT,
+      file: file
+    }
   }
   start () {
-    this.statu = 'md5'
     this._getFileMd5()
   }
   /**
    * 获取文件M5
    */
   _getFileMd5 () {
-    this.trigger(this.statu)
-    getFileMd5(this.file)
+    this.trigger(config.UPLOAD_STATUS.MD5)
+    getFileMd5(this.fileInfo.file)
       .then(this._auth.bind(this))
   }
   /**
@@ -36,36 +45,44 @@ export default class FileSdk extends Events {
    * @param {string} md5 
    */
   _auth (md5) {
-    this.statu = 'auth'
-    this.trigger(this.statu)
-    auth(md5, this.file.size, this.file.name)
+    this.fileInfo.MD5 = md5
+    this.trigger(config.UPLOAD_STATUS.AUTH)
+    auth(md5, this.fileInfo.size, this.fileInfo.name)
       .then(this._section.bind(this))
   }
   /**
    * 获取文件的一部分
    * @param {object} res 认证返回的对象
    */
-  _section (res) {
-    section(this.file, 0, 1000)
+  _section () {
+    section(this.fileInfo.file, this.fileInfo.start, this.fileInfo.chunkSize)
       .then((blob) => {
-        console.log(blob)
+        this._uploadChunk(blob)
       })
   }
+  _uploadChunk (file) {
+    // 上传分片~
+    console.log("_uploadChunk_")
+    this.trigger(config.UPLOAD_STATUS.UPLOADING)
+    let uploader = uploadChunk(this.fileInfo)
+    uploader.start()
+    console.log('0000')
+  }
   upload () {
-    let uploader = ajaxUploader(this.file)
-    uploader.on('progress', (data, loaded) => {
-      this.statu = 'progress'
-      this.trigger('progress', data, loaded)
-    })
-    uploader.on('success', (data) => {
-      this.statu = 'success'
-      this.trigger('success', data)
-    })
-    uploader.on('abort', (data) => {
-      this.statu = 'abort'
-      this.trigger('abort', data)
-    })
-    this.uploader = uploader
+    // let uploader = ajaxUploader(this.file)
+    // uploader.on('progress', (data, loaded) => {
+    //   this.statu = 'progress'
+    //   this.trigger('progress', data, loaded)
+    // })
+    // uploader.on('success', (data) => {
+    //   this.statu = 'success'
+    //   this.trigger('success', data)
+    // })
+    // uploader.on('abort', (data) => {
+    //   this.statu = 'abort'
+    //   this.trigger('abort', data)
+    // })
+    // this.uploader = uploader
   }
   getUploader () {
     return this.uploader

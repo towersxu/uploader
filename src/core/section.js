@@ -4,6 +4,7 @@
  * @param {integer} start 开始切片的位置
  * @param {integer} length 需要切片的大小, 单位b
  */
+// todo: 队列处理
 export default function (blob, start, length) {
   return new Promise((resove) => {
     var nb = blob.slice(start, start + length)

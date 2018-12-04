@@ -12,6 +12,13 @@ let CONFIG = {
   _suffix_list: [],
   _chunk_size: 5 * 1024 * 1024, // 通webupload一样，5M的默认分片大小,
 }
+
+let UPLOAD_STATUS = {
+  INIT: 'init',
+  MD5: 'md5',
+  UPLOADING: 'uploading' // 上传中
+}
+
 export default {
   /**
    * 获取上传服务器地址
@@ -43,5 +50,6 @@ export default {
   chunkSize: CONFIG._chunk_size,
   setChunkSize (size) {
     CONFIG._chunk_size = size
-  }
+  },
+  UPLOAD_STATUS: UPLOAD_STATUS
 }

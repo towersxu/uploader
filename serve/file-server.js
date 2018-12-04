@@ -6,6 +6,7 @@ const fs = require('fs')
 const only = require('only');
 const uuid = require('./uuid')
 const bodyParser = require('body-parser')
+const multer = require('multer')
 
 app.use(bodyParser.json())       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -13,12 +14,11 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 }))
 
 app.use(function (req, res, next) {
-  console.log(1111)
   res.header('Access-Control-Allow-Origin', '*')
   res.header('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS')
   res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, Content-Length, X-Requested-With')
   // intercept OPTIONS method
-  if (req.method == 'OPTIONS' && req.originalUrl === '/upload') {
+  if (req.method == 'OPTIONS') {
     res.sendStatus(200)
   } else {
     next()
@@ -26,14 +26,73 @@ app.use(function (req, res, next) {
 })
 
 app.post('/upload/checkFileMd5', function (req, res) {
-  let data = only(req.body, 'md5 hasMd5 userId moduleKey size bussinessId fileName fileFormat')
-  console.log(data)
+  // let data = only(req.body, 'md5 hasMd5 userId moduleKey size bussinessId fileName fileFormat')
   let uid = uuid()
   res.json({
     code: 0,
     data: [],
     token: uid
   })
+})
+// 处理文件上传
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    let dir = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/')
+    if (fs.existsSync(dir)) {
+      cb(null, dir)
+    } else {
+      fs.mkdir(dir, { recursive: true }, (err) => {
+        cb(null, dir)
+      })
+    }
+  },
+  filename: function (req, file, cb) {
+    cb(null, req.body.chunkIndex + '.part')
+  }
+})
+
+let upload = multer({ storage: storage })
+
+app.post('/upload/fileUpload', upload.single('file'), function (req, res) {
+  let tempFile = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/' + req.body.chunkIndex + '.part')
+  let configFile = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/config.json')
+  if (fs.existsSync(tempFile)) {
+    // 文件写入成功，则读取文件配置信息
+    var conf = {
+      chunks: [],
+      chunkSize: 0,
+      chunkLength: 0
+    }
+    if (fs.existsSync(configFile)) {
+      conf = JSON.parse(fs.readFileSync(configFile))
+    }
+    // todo: 各种校验
+    let chunkIndex = Number(req.body.chunkIndex)
+    if (conf.chunks.indexOf(chunkIndex) === -1) {
+      conf.chunks.push()
+      conf.chunkLength = req.body.chunkLength
+      conf.chunkSize = req.body.chunkSize
+      conf.size = req.body.size
+      conf.name = req.body.name
+      fs.writeFile(configFile, JSON.stringify(conf), 'utf8', function () {
+        // 如果所有的part文件已经完成上传了,合并part文件
+        res.json({
+          code: 0,
+          data: conf
+        })
+      })
+    } else {
+      res.json({
+        code: 0,
+        data: conf
+      })
+    }
+  } else {
+    res.json({
+      code: 0,
+      data: []
+    })
+  }
 })
 
 app.post('/upload', function (req, res) {
@@ -78,6 +137,8 @@ app.post('/upload', function (req, res) {
   // parse the incoming request containing the form data
   form.parse(req)
 })
+
+
 
 app.listen(4000, function () {
   console.log('serve listen on port 4000')

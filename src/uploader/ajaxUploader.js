@@ -11,6 +11,7 @@
 
 import ajax from '../assets/polyfills/ajax'
 import Events from '../events'
+import config from '../config'
 
 // 自定义一个上传队列
 // NOTE: 上传队列是否会被堵死？
@@ -48,15 +49,18 @@ const UPLOADER_QUEUE = Object.freeze({
  * 调用上传功能
  */
 class Uploader extends Events {
-  constructor (file) {
+  constructor (data) {
     super()
-    this.file = file
+    this.data = data
   }
   start () {
+    console.log('start....')
     let form = new FormData()
     form.append('Content-Type', 'application/octet-stream')
-    form.append('attach', this.file)
-    this.xhr = ajax.postFile('http://localhost:4000/upload', {
+    Object.keys(this.data).map((key) => {
+      form.append(key, this.data[key])
+    })
+    this.xhr = ajax.postFile(config.getUploaderServerPath(), {
       data: form,
       progress: (progress, loaded) => {
         this.trigger('progress', progress, loaded)
@@ -85,4 +89,10 @@ export default function (file) {
   let uploader = new Uploader(file)
   UPLOADER_QUEUE.push(uploader)
   return uploader
+}
+
+export function uploadChunk (data) {
+  // let uploader = new Uploader(data)
+  // UPLOADER_QUEUE.push(uploader)
+  return new Uploader(data)
 }
