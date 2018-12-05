@@ -23,6 +23,15 @@ export default class WebUi extends Render {
     this.resetUploadBtn()
     this.progressEls = []
     this.fileListHeader = new Header(theme)
+    this.fileListHeader.on('minify', (isMinify) => {
+      // todo: 
+      let fileListVnode = this.h(`div.${this.theme}-fileset`, {
+        class: {
+          minified: isMinify
+        }
+      }, this.progressEls)
+      this.fileListVnode = this.patch(this.fileListVnode, fileListVnode)
+    })
     this.progressEls.push(this.fileListHeader.getEl())
     this.list = this.h(`div.${this.theme}-progress-list`, [])
     this.progressEls.push(this.list)

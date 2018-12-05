@@ -39,6 +39,7 @@
   margin-bottom: -2px;
   font-family: 'Microsoft YaHei', SimSun;
   background: #fff;
+  transition: all 0.3s ease;
   &-header {
     height: 44px;
     line-height: 44px;
@@ -50,6 +51,10 @@
     height: 300px;
     overflow: hidden;
     overflow-y: auto;
+  }
+  &.minified {
+    height: 44px;
+    transition: all 0.3s ease;
   }
 }
 
@@ -65,11 +70,15 @@
   font-size: 14px;
   margin-left: 14px;
   display: inline-block;
-  width: 380px;
+  width: 340px;
   white-space: nowrap;
   text-overflow: ellipsis;
   overflow: hidden;
   vertical-align: middle;
+}
+.@{theme}-header-tools {
+  display: inline-block;
+  width: 70px;
 }
 
 // 上传进度
@@ -129,7 +138,7 @@
     height: 50px;
     overflow: hidden;
     float: right;
-    margin-right: 5px;
+    margin-right: 15px;
   }
 }
 
@@ -181,6 +190,28 @@
     width: 20px;
     height: 20px;
     margin-right: 5px;
+  }
+  &-mini {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    cursor: pointer;
+  }
+  &-hclose {
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    position: relative;
+    top: 4px;
+    cursor: pointer;
+  }
+  &-chuangkou {
+    width: 20px;
+    height: 20px;
+    margin-right: 15px;
+    cursor: pointer;
+    position: relative;
+    top: 4px;
   }
 }
 

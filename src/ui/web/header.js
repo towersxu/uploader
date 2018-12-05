@@ -1,5 +1,6 @@
 import UiComponents from '../ui-components'
 import Events from '../../events'
+import Icon from '../icon'
 const STATUS_TEXT = ['UPLOAD_HEADER', 'UPLOADING', 'UPLOADED']
 
 export default class Header extends UiComponents {
@@ -24,10 +25,70 @@ export default class Header extends UiComponents {
     let text = this.getTextByStatus(status)
     this.headerText = this.h(`span.${this.theme}-header-text`, text)
     this.errorInfo = this.h(`span.${this.theme}-header-error`, '')
+    let miniEl = new Icon(this.theme, 'mini', 16, 16, `${this.theme}-icon-mini`)
+    let closeEl = new Icon(this.theme, 'close', 16, 16, `${this.theme}-icon-hclose`)
+    let miniElSpan = this.h(`span`, {
+      on: {
+        click: this.minified.bind(this)
+      }
+    }, [miniEl.getEl()])
+    let closeElSpan = this.h(`span`, {
+      on: {
+        click: this.close.bind(this)
+      }
+    }, [closeEl.getEl()])
+    this.tools = this.h(`span.${this.theme}-header-tools`, [
+      miniElSpan,
+      closeElSpan
+    ])
     this.el = this.h(`div.${this.theme}-fileset-header`, [
       this.headerText,
-      this.errorInfo
+      this.errorInfo,
+      this.tools
     ])
+  }
+  minified () {
+    this.trigger('minify', true)
+    let unminiEl = new Icon(this.theme, 'chuangkou', 16, 16, `${this.theme}-icon-chuangkou`)
+    let closeEl = new Icon(this.theme, 'close', 16, 16, `${this.theme}-icon-hclose`)
+    let miniElSpan = this.h(`span`, {
+      on: {
+        click: this.unminified.bind(this)
+      }
+    }, [unminiEl.getEl()])
+    let closeElSpan = this.h(`span`, {
+      on: {
+        click: this.close.bind(this)
+      }
+    }, [closeEl.getEl()])
+    let tools = this.h(`span.${this.theme}-header-tools`, [
+      miniElSpan,
+      closeElSpan
+    ])
+    this.tools = this.patch(this.tools, tools)
+  }
+  unminified () {
+    this.trigger('minify', false)
+    let miniEl = new Icon(this.theme, 'mini', 16, 16, `${this.theme}-icon-mini`)
+    let closeEl = new Icon(this.theme, 'close', 16, 16, `${this.theme}-icon-hclose`)
+    let miniElSpan = this.h(`span`, {
+      on: {
+        click: this.minified.bind(this)
+      }
+    }, [miniEl.getEl()])
+    let closeElSpan = this.h(`span`, {
+      on: {
+        click: this.close.bind(this)
+      }
+    }, [closeEl.getEl()])
+    let tools = this.h(`span.${this.theme}-header-tools`, [
+      miniElSpan,
+      closeElSpan
+    ])
+    this.tools = this.patch(this.tools, tools)
+  }
+  close () {
+    this.trigger('close', true)
   }
   changeStatus (status) {
     let text = this.getTextByStatus(status)

@@ -220,7 +220,6 @@ class ProgressTools extends UiComponents {
    * 删除上传
    */
   deleteUpload () {
-    console.log(222)
     this.trigger('delete')
   }
   /**

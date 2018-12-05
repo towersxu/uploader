@@ -1,7 +1,13 @@
 import UiComponents from './ui-components'
 import '../assets/fonts/iconfont.js'
 
-const icons = ['avi', 'swf', 'wav', 'txt', 'rmvb', 'xls', 'mkv', 'psd', 'mpg', 'exe', 'gif', 'pdf', 'mp4', 'ppt', 'dll', 'png', 'mp3', 'html', 'jpg', 'doc', 'close', 'zanting', 'success', 'delete', 'pause', 'contine', 'jixu', 'waiting', 'loading']
+const icons = ['avi', 'swf', 'wav', 'txt', 'rmvb',
+               'xls', 'mkv', 'psd', 'mpg', 'exe', 
+               'gif', 'pdf', 'mp4', 'ppt', 'dll',
+               'png', 'mp3', 'html', 'jpg', 'doc', 
+               'close', 'zanting', 'success', 'delete', 
+               'pause', 'contine', 'jixu', 'waiting', 
+               'loading', 'chuangkou', 'mini']
 
 function getIconSuffix (suffix) {
   suffix = suffix.toLowerCase()
