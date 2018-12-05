@@ -1,18 +1,20 @@
 import UiComponents from '../ui-components'
 import Icon from '../icon'
-
+import config from '../../config'
 /**
  * 进度条
  */
 export default class Progress extends UiComponents {
-  constructor (theme, name, suffix, size) {
+  constructor (theme, name, suffix, size, key) {
     super(theme)
     this.progressbar = new ProgressBar(theme, name, suffix, size)
     this.progressbg = new ProgressBg(theme)
     let children = []
     children.push(this.progressbar.getEl())
     children.push(this.progressbg.getEl())
-    this.el = this.h(`div.${this.theme}-progress`, children)
+    this.el = this.h(`div.${this.theme}-progress`, {
+      key: key
+    }, children)
     // init listener
     this.progressbar.on('delete', () => {
       this.trigger('delete')
@@ -61,12 +63,14 @@ class ProgressBar extends UiComponents {
     })
     this.ptools.on('delete', () => {
       this.trigger('delete')
-      console.log('delete')
     })
   }
   setStatus (statu, data) {
-    if (statu === 'auth') {
+    if (statu === config.UPLOAD_STATUS.AUTH) {
       this.size.setStatus(1, '认证中')
+    }
+    if (statu === config.UPLOAD_STATUS.WAITING) {
+      this.size.setStatus(1, '待上传')
     }
     this.ptools.setStatus(statu, data)
   }
@@ -164,7 +168,8 @@ class ProgressTools extends UiComponents {
     this.pauseEl = this.createPauseIcon()
     this.startEl = this.createStartIcon()
     this.md5El = this.createMd5Icon()
-    this.el = this.h(`div.${this.theme}-progress-tools`, [this.closeEl, this.md5El])
+    this.waitingEl = this.createIcon('waiting')
+    this.el = this.h(`div.${this.theme}-progress-tools`, [this.closeEl, this.waitingEl])
   }
   createCloseIcon () {
     let icon = new Icon(this.theme, 'delete', 20, 20, `${this.theme}-icon-close`)
@@ -191,8 +196,12 @@ class ProgressTools extends UiComponents {
     }, [icon.getEl()])
   }
   createMd5Icon () {
-    let icon = new Icon(this.theme, 'waiting', 20, 20, `${this.theme}-icon-waiting`, `${this.theme}-animate-rotate`)
-    return this.h(`span.${this.theme}-tool-waiting.${this.theme}-tool`, [icon.getEl()])
+    let icon = new Icon(this.theme, 'loading', 20, 20, `${this.theme}-icon-loading`, `${this.theme}-animate-rotate`)
+    return this.h(`span.${this.theme}-tool-loading.${this.theme}-tool`, [icon.getEl()])
+  }
+  createIcon (type) {
+    let icon = new Icon(this.theme, type, 20, 20, `${this.theme}-icon-${type}`)
+    return this.h(`span.${this.theme}-tool-${type}.${this.theme}-tool`, [icon.getEl()])
   }
   // 暂停上传
   pauseUpload () {
@@ -229,6 +238,15 @@ class ProgressTools extends UiComponents {
     this.el = newEl
   }
   /**
+   * 
+   * @param {array} els 修改的els
+   */
+  changeIconEls (els) {
+    let newEl = this.h(`div.${this.theme}-progress-tools`, els)
+    this.patch(this.el, newEl)
+    this.el = newEl
+  }
+  /**
    * 上传失败
    */
   // todo: 上传失败
@@ -242,9 +260,10 @@ class ProgressTools extends UiComponents {
     if (statu === 'success') {
       this.uploadSuccess()
     }
-    // else if (statu === 'md5') { // MD5计算
-    //   this.md5Calculating()
-    // }
+    else if (statu === config.UPLOAD_STATUS.AUTH) {
+      // this.md5Calculating()
+      this.changeIconEls([this.closeEl, this.md5El])
+    }
     else {
       this.uploadFailed()
     }

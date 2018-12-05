@@ -7,6 +7,7 @@ const only = require('only');
 const uuid = require('./uuid')
 const bodyParser = require('body-parser')
 const multer = require('multer')
+const concat = require('concat-files')
 
 app.use(bodyParser.json())       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -70,16 +71,28 @@ app.post('/upload/fileUpload', upload.single('file'), function (req, res) {
     let chunkIndex = Number(req.body.chunkIndex)
     if (conf.chunks.indexOf(chunkIndex) === -1) {
       conf.chunks.push(chunkIndex)
-      conf.chunkLength = req.body.chunkLength
+      conf.chunkLength = Number(req.body.chunkLength)
       conf.chunkSize = req.body.chunkSize
       conf.size = req.body.size
       conf.name = req.body.name
       fs.writeFile(configFile, JSON.stringify(conf), 'utf8', function () {
         // 如果所有的part文件已经完成上传了,合并part文件
-        res.json({
-          code: 0,
-          data: conf
-        })
+        if (conf.chunks.length === conf.chunkLength) {
+          concat(conf.chunks.map((c) => {
+            return path.resolve(__dirname, './uploads/' + req.body.MD5 + '/' + c + '.part')
+          }), path.resolve(__dirname, './uploads/' + req.body.MD5 + '/' + req.body.name), function (err) {
+            res.json({
+              code: 0,
+              filePath: '/uploads/' + req.body.MD5 + '/' + req.body.name,
+              data: conf
+            })
+          })
+        } else {
+          res.json({
+            code: 0,
+            data: conf
+          })
+        }
       })
     } else {
       res.json({

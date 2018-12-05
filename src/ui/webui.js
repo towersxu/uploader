@@ -48,11 +48,13 @@ export default class WebUi extends Render {
   fileChange (e) {
     // todo: IE9 无法获取file
     let files = []
-    Array.prototype.map.call(e.target.files, (f) => {
+    Array.prototype.map.call(e.target.files, (f, idx) => {
       let suffix = toolsUtil.getSuffix(f.name)
       if (suffix) { // 只能上传带有后缀的文件
         let fs = new FileSdk(f)
-        let progress = new Progress(this.theme, f.name, suffix, f.size)
+        let pidx = this.files.length + idx
+        let progress = new Progress(this.theme, f.name, suffix, f.size, pidx)
+        progress.idx = pidx // 因为有多个序号，所以
         fs.on('progress', (data, loaded) => {
           if (!loaded) {
             loaded = f.size
@@ -68,6 +70,9 @@ export default class WebUi extends Render {
         fs.on('auth', () => {
           progress.setStatus('auth')
         })
+        fs.on('waiting', () => {
+          progress.setStatus('waiting')
+        })
         progress.on('pause', () => {
           // fs.pause()
         })
@@ -81,15 +86,19 @@ export default class WebUi extends Render {
           // fs.cancel()
           let uploader = fs.getUploader()
           if (uploader) {
-            uploader.abort()
+            uploader.cancel()
           }
+          this.files[progress.idx].show = false
+          this.handleFiles()
         })
         fs.start()
         files.push({
           f: fs,
+          idx: progress.idx,
           p: progress,
           name: f.name,
           size: f.size,
+          show: true,
           suffix: suffix
         })
       } else {
@@ -105,8 +114,10 @@ export default class WebUi extends Render {
   }
   handleFiles () {
     let allProgress = []
-    this.files.map((file) => {
-      allProgress.push(file.p.getEl())
+    this.files.forEach((file) => {
+      if (file.show) {
+        allProgress.push(file.p.getEl())
+      }
     })
     // warning: 感觉这种写法好傻，创建一个新对象，比较新对象与之前的对象。在DOM渲染后在将旧对象引用指向新对象，然后回收旧对象。
     // warning: 如果双向绑定一定是这样做，注意不要一次修改整个对象树，而是只修改某个子树。

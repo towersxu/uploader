@@ -28,16 +28,40 @@ export default class FileSdk extends Events {
       _file: file,
       file: '',
       _uploadSize: 0,
+      _statu: config.UPLOAD_STATUS.INIT,
       _progress: 0,
     }
   }
+  /**
+   * 开始上传
+   */
   start () {
     this._getFileMd5()
+  }
+  /**
+   * 暂停上传
+   */
+  pause () {
+    this._setFileInfoStatu(config.UPLOAD_STATUS.PAUSE)
+  }
+  /**
+   * 取消上传
+   */
+  cancel () {
+    this._setFileInfoStatu(config.UPLOAD_STATUS.CANCEL)
+  }
+  /**
+   * 设置文件上传状态
+   * @param {string} statu 文件状态
+   */
+  _setFileInfoStatu (statu) {
+    this.fileInfo._statu = statu
   }
   /**
    * 获取文件M5
    */
   _getFileMd5 () {
+    this._setFileInfoStatu(config.UPLOAD_STATUS.MD5)
     this.trigger(config.UPLOAD_STATUS.MD5)
     getFileMd5(this.fileInfo._file)
       .then(this._auth.bind(this))
@@ -48,6 +72,7 @@ export default class FileSdk extends Events {
    */
   _auth (md5) {
     this.fileInfo.MD5 = md5
+    this._setFileInfoStatu(config.UPLOAD_STATUS.AUTH)
     this.trigger(config.UPLOAD_STATUS.AUTH)
     auth(md5, this.fileInfo.size, this.fileInfo.name)
       .then(this._section.bind(this))
@@ -64,6 +89,7 @@ export default class FileSdk extends Events {
   }
   _uploadChunk (blob) {
     // 上传分片~
+    this._setFileInfoStatu(config.UPLOAD_STATUS.PROGRESS)
     this.fileInfo.file = blob
     let uploader = uploadChunk(this.fileInfo)
     uploader.on('progress', (progress, loaded) => {
@@ -77,8 +103,14 @@ export default class FileSdk extends Events {
     uploader.on('success', (data) => {
       if (this.fileInfo.chunkIndex < this.fileInfo.chunkLength - 1) {
         this.fileInfo.start = (this.fileInfo.chunkIndex += 1) * this.fileInfo.chunkSize
-        this._section() 
+        // 如果上传被暂时或者删除了，则不继续上传下一个分片
+        if (this.fileInfo._statu === config.UPLOAD_STATUS.PROGRESS) {
+          this._section()
+        }
       } else {
+        // todo: 如果刚好在上传最后一个分片的过程中暂停
+        // todo: 如果刚好在上传最后一个分片的过程中删除
+        this._setFileInfoStatu(config.UPLOAD_STATUS.SUCCESS)
         this.trigger(
           config.UPLOAD_STATUS.PROGRESS,
           '100%',

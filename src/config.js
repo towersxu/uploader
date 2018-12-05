@@ -16,8 +16,12 @@ let CONFIG = {
 let UPLOAD_STATUS = {
   INIT: 'init',
   MD5: 'md5',
+  AUTH: 'auth',
   PROGRESS: 'progress', // 上传中
-  SUCCESS: 'sucess' // 上传成功
+  SUCCESS: 'success', // 上传成功
+  CANCEL: 'cancel', // 取消上传
+  PAUSE: 'pause', // 暂停
+  WAITING: 'waiting' // 待上传
 }
 
 export default {
