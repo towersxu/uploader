@@ -56,6 +56,21 @@
     height: 44px;
     transition: all 0.3s ease;
   }
+  &.hide {
+    display: none;
+  }
+  &.show {
+    animation: showfileset 0.3s ease;
+  }
+}
+
+@keyframes showfileset {
+  from {
+    bottom: -400px;
+  }
+  to {
+    bottom: 0px;
+  }
 }
 
 .@{theme}-header-text {

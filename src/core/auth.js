@@ -4,7 +4,7 @@ import config from '../config'
 export default function (md5, size, name) {
   return new Promise((resolve) => {
     ajax.post({
-      url: config.getBackendServerPath(),
+      url: config.uploadPath,
       data: {
         hasMd5: true,
         md5: md5,

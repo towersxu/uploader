@@ -44,20 +44,18 @@
   var UPLOADER_PATH = 'http://10.4.86.4:4001/preupload'
   var uploader = new window.Uploader({
     path: UPLOADER_PATH,
+    headers: {},
     uploadPath: 'http://10.4.86.4:4000/upload/fileUpload',
     btnEl: document.getElementById('uploader-button'),
     fileListEl: document.getElementById('filelist'),
-    accepts: 'images/*', // 可选，接收格式，如果
-    whiteSuffixList: ['png', 'gif', 'jpeg'], // 可上传图片的格式
     env: 'webui', // webui > mobileui > websdk > mobilesdk
     theme: 'default',
-    options: {
-      auto: false,
-      md5: true,
-      type: 'ws', // 'ws'>'http'>'flash'. default: 'ws'
-      queued: '2',
-      ticket: 'bearer bxxx'
-    }
+    accepts: 'images/*', // 可选，接收格式，如果
+    whiteSuffixList: ['png', 'gif', 'jpeg'], // 可上传图片的格式
+    auto: false,
+    md5: true,
+    type: 'ws', // 'ws'>'http'>'flash'. default: 'ws'
+    queued: '2'
   })
   console.log(uploader)
   </script>

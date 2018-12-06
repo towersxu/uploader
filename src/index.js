@@ -2,7 +2,7 @@
 
 import LOG from './logger.js'
 import WebUi from './ui/webui'
-import config from './config'
+import { setConfig } from './config'
 
 const UI_TYPES = [
   'webui', // 带样式的web端文件上传
@@ -22,16 +22,15 @@ export class Uploader {
    * @param { string } theme - 上传的主题标签
    * @param { object } options - 上传设置配置
    */
-  constructor ({ path, uploadPath, btnEl, fileListEl, env, theme = 'default', options }) {
-    if (this.validate(env, btnEl, fileListEl)) {
-      this.env = env
-      this.btnEl = btnEl
-      this.fileListEl = fileListEl
-      this.path = path
-      this.options = options
-      this.theme = theme
-      config.setBackendServerPath(path) 
-      config.setUploaderServerPath(uploadPath)
+  constructor (option) {
+    let config = setConfig(option)
+    if (this.validate(config.env, config.btnEl, config.fileListEl)) {
+      this.env = config.env
+      this.btnEl = config.btnEl
+      this.fileListEl = config.fileListEl
+      this.path = config.path
+      this.options = config.options
+      this.theme = config.theme
       this.handleUploader()
     }
   }

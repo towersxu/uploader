@@ -4,6 +4,7 @@ import Progress from './web/progress'
 import Header from './web/header'
 import toolsUtil from '../utils/toolsUtil'
 import Events from '../events'
+import config from '../config'
 
 export default class WebUi extends Render {
   constructor (btnEl, fileListEl, theme) {
@@ -23,8 +24,24 @@ export default class WebUi extends Render {
     this.resetUploadBtn()
     this.progressEls = []
     this.fileListHeader = new Header(theme)
-    this.fileListHeader.on('minify', (isMinify) => {
-      // todo: 
+    this.progressEls.push(this.fileListHeader.getEl())
+    this.list = this.h(`div.${this.theme}-progress-list`, [])
+    this.progressEls.push(this.list)
+    this.fileListVnode = this.h(`div.${this.theme}-fileset`, {
+      class: {
+        hide: !config.showUI,
+        minified: !!config.minified
+      }
+    }, this.progressEls)
+    this.patch(fileListEl, this.fileListVnode)
+    this.initListener()
+  }
+  initListener () {
+    /**
+     * @event WEBUI:MINIFY_FILESET
+     * 监听最小化上传UI
+     */
+    Events.on('WEBUI:MINIFY_FILESET', (isMinify) => {
       let fileListVnode = this.h(`div.${this.theme}-fileset`, {
         class: {
           minified: isMinify
@@ -32,11 +49,33 @@ export default class WebUi extends Render {
       }, this.progressEls)
       this.fileListVnode = this.patch(this.fileListVnode, fileListVnode)
     })
-    this.progressEls.push(this.fileListHeader.getEl())
-    this.list = this.h(`div.${this.theme}-progress-list`, [])
-    this.progressEls.push(this.list)
-    this.fileListVnode = this.h(`div.${this.theme}-fileset`, this.progressEls)
-    this.patch(fileListEl, this.fileListVnode)
+    /**
+     * @event WEBUI:CLOSE_FILESET
+     * 监听关闭上传UI
+     */
+    Events.on('WEBUI:CLOSE_FILESET', () => {
+      let fileListVnode = this.h(`div.${this.theme}-fileset`, {
+        class: {
+          hide: true
+        }
+      }, this.progressEls)
+      this.fileListVnode = this.patch(this.fileListVnode, fileListVnode)
+    })
+    /**
+     * @on WEBUI:SHOW_FILESET
+     * 监听显示文件列表
+     */
+    Events.on('WEBUI:SHOW_FILESET', () => {
+      let fileListVnode = this.h(`div.${this.theme}-fileset`, {
+        class: {
+          hide: false,
+          show: true,
+          minified: false
+        }
+      }, this.progressEls)
+      this.fileListVnode = this.patch(this.fileListVnode, fileListVnode)
+      this.fileListHeader.minifiedHeaderIcon()
+    })
   }
   /**
    * 包裹上传元素，使其能进行上传
@@ -56,6 +95,9 @@ export default class WebUi extends Render {
   // 根据上传的文件数，初始化文件上传对象
   fileChange (e) {
     // todo: IE9 无法获取file
+    if (!config.customUI && !config.showUI) {
+      Events.trigger('WEBUI:SHOW_FILESET')
+    }
     let files = []
     Array.prototype.map.call(e.target.files, (f, idx) => {
       let suffix = toolsUtil.getSuffix(f.name)

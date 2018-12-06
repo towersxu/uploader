@@ -1,6 +1,7 @@
 import UiComponents from '../ui-components'
 import Events from '../../events'
 import Icon from '../icon'
+import config from '../../config'
 const STATUS_TEXT = ['UPLOAD_HEADER', 'UPLOADING', 'UPLOADED']
 
 export default class Header extends UiComponents {
@@ -26,21 +27,36 @@ export default class Header extends UiComponents {
     this.headerText = this.h(`span.${this.theme}-header-text`, text)
     this.errorInfo = this.h(`span.${this.theme}-header-error`, '')
     let miniEl = new Icon(this.theme, 'mini', 16, 16, `${this.theme}-icon-mini`)
+    let unminiEl = new Icon(this.theme, 'chuangkou', 16, 16, `${this.theme}-icon-chuangkou`)
     let closeEl = new Icon(this.theme, 'close', 16, 16, `${this.theme}-icon-hclose`)
-    let miniElSpan = this.h(`span`, {
+    this.miniElSpan = this.h(`span`, {
       on: {
         click: this.minified.bind(this)
       }
     }, [miniEl.getEl()])
-    let closeElSpan = this.h(`span`, {
+    this.unminiElSpan = this.h(`span`, {
+      on: {
+        click: this.unminified.bind(this)
+      }
+    }, [unminiEl.getEl()])    
+    this.closeElSpan = this.h(`span`, {
       on: {
         click: this.close.bind(this)
       }
     }, [closeEl.getEl()])
-    this.tools = this.h(`span.${this.theme}-header-tools`, [
-      miniElSpan,
-      closeElSpan
-    ])
+    let tools = []
+    if (config.minified) {
+      tools = [
+        this.unminiElSpan,
+        this.closeElSpan
+      ]
+    } else {
+      tools = [
+        this.miniElSpan,
+        this.closeElSpan
+      ]
+    }
+    this.tools = this.h(`span.${this.theme}-header-tools`, tools)
     this.el = this.h(`div.${this.theme}-fileset-header`, [
       this.headerText,
       this.errorInfo,
@@ -48,47 +64,38 @@ export default class Header extends UiComponents {
     ])
   }
   minified () {
-    this.trigger('minify', true)
-    let unminiEl = new Icon(this.theme, 'chuangkou', 16, 16, `${this.theme}-icon-chuangkou`)
-    let closeEl = new Icon(this.theme, 'close', 16, 16, `${this.theme}-icon-hclose`)
-    let miniElSpan = this.h(`span`, {
-      on: {
-        click: this.unminified.bind(this)
-      }
-    }, [unminiEl.getEl()])
-    let closeElSpan = this.h(`span`, {
-      on: {
-        click: this.close.bind(this)
-      }
-    }, [closeEl.getEl()])
+    // this.trigger('minify', true)
+    Events.trigger('WEBUI:MINIFY_FILESET', true)
+    this.unminifiedHeaderIcon()
+  }
+  /**
+   * 修改header图片为unminEl图标
+   */
+  unminifiedHeaderIcon () {
     let tools = this.h(`span.${this.theme}-header-tools`, [
-      miniElSpan,
-      closeElSpan
+      this.unminiElSpan,
+      this.closeElSpan
     ])
     this.tools = this.patch(this.tools, tools)
   }
   unminified () {
-    this.trigger('minify', false)
-    let miniEl = new Icon(this.theme, 'mini', 16, 16, `${this.theme}-icon-mini`)
-    let closeEl = new Icon(this.theme, 'close', 16, 16, `${this.theme}-icon-hclose`)
-    let miniElSpan = this.h(`span`, {
-      on: {
-        click: this.minified.bind(this)
-      }
-    }, [miniEl.getEl()])
-    let closeElSpan = this.h(`span`, {
-      on: {
-        click: this.close.bind(this)
-      }
-    }, [closeEl.getEl()])
+    // this.trigger('minify', false)
+    Events.trigger('WEBUI:MINIFY_FILESET', false)
+    this.minifiedHeaderIcon()
+  }
+  /**
+   * 修改head图标为miniEl图标
+   */
+  minifiedHeaderIcon () {
     let tools = this.h(`span.${this.theme}-header-tools`, [
-      miniElSpan,
-      closeElSpan
+      this.miniElSpan,
+      this.closeElSpan
     ])
     this.tools = this.patch(this.tools, tools)
   }
   close () {
-    this.trigger('close', true)
+    // this.trigger('close', true)
+    Events.trigger('WEBUI:CLOSE_FILESET', true)
   }
   changeStatus (status) {
     let text = this.getTextByStatus(status)
