@@ -59,25 +59,25 @@ export default class FileCore {
 
 FileCore.uploadFile = function (f) {
   let fs = new FileSdk(f)
-  fs.on('progress', (data, loaded) => {
-    if (!loaded) {
-      loaded = f.size
-    }
+  // fs.on('progress', (data, loaded) => {
+  //   if (!loaded) {
+  //     loaded = f.size
+  //   }
 
-    // progress.setProgress(data, loaded)
-  })
-  fs.on('success', (data) => {
-    // progress.setStatus('success', data)
-  })
-  fs.on('md5', () => {
-    // progress.setStatus('md5')
-  })
-  fs.on('auth', () => {
-    // progress.setStatus('auth')
-  })
-  fs.on('waiting', () => {
-    // progress.setStatus('waiting')
-  })
+  //   // progress.setProgress(data, loaded)
+  // })
+  // fs.on('success', (data) => {
+  //   // progress.setStatus('success', data)
+  // })
+  // fs.on('md5', () => {
+  //   // progress.setStatus('md5')
+  // })
+  // fs.on('auth', () => {
+  //   // progress.setStatus('auth')
+  // })
+  // fs.on('waiting', () => {
+  //   // progress.setStatus('waiting')
+  // })
   fs.start()
   return fs
 }
