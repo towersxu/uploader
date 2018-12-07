@@ -7,10 +7,12 @@ let UPLOAD_STATUS = {
   INIT: 'init',
   MD5: 'md5',
   AUTH: 'auth',
+  AUTHERROR: 'autherror', // 认证失败
   PROGRESS: 'progress', // 上传中
   SUCCESS: 'success', // 上传成功
   CANCEL: 'cancel', // 取消上传
   PAUSE: 'pause', // 暂停
+  FAILED: 'failed', //上传失败
   WAITING: 'waiting' // 待上传
 }
 
@@ -36,7 +38,7 @@ let CONFIG = {
   // 分片上传文件的大小
   chunkSize: 5 * 1024 * 1024, // 通webupload一样，5M的默认分片大小,
   // 自动上传
-  auto: false,
+  auto: true,
   // md5快传
   md5: true,
   /**
@@ -83,37 +85,3 @@ export function setConfig (conf) {
 
 export default CONFIG
 
-// export default {
-//   /**
-//    * 获取上传服务器地址
-//    */
-//   getUploaderServerPath () {
-//     return CONFIG._upload_server_path
-//   },
-//   /**
-//    * 获取后端服务器地址
-//    */
-//   getBackendServerPath () {
-//     if (!CONFIG._backend_server_path) {
-//       logger.error('CF1001')
-//     }
-//     return CONFIG._backend_server_path
-//   },
-//   /**
-//    * 设置上传服务器地址
-//    */
-//   setUploaderServerPath (path) {
-//     CONFIG._upload_server_path = path
-//   },
-//   /**
-//    * 设置后端服务器地址
-//    */
-//   setBackendServerPath (path) {
-//     CONFIG._backend_server_path = path
-//   },
-//   chunkSize: CONFIG._chunk_size,
-//   setChunkSize (size) {
-//     CONFIG._chunk_size = size
-//   },
-//   UPLOAD_STATUS: UPLOAD_STATUS
-// }

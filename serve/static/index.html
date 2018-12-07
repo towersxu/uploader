@@ -51,11 +51,32 @@
     env: 'webui', // webui > mobileui > websdk > mobilesdk
     theme: 'default',
     accepts: 'images/*', // 可选，接收格式，如果
-    whiteSuffixList: ['png', 'gif', 'jpeg'], // 可上传图片的格式
-    auto: false,
+    whiteSuffixList: ['png', 'gif', 'jpeg', 'mp4', 'zip'], // 可上传图片的格式
+    // auto: false,
+    customUI: false,
     md5: true,
     type: 'ws', // 'ws'>'http'>'flash'. default: 'ws'
     queued: '2'
+  })
+  // 选择文件
+  uploader.on('change', function (files) {
+    console.log('change')
+  })
+  // 文件正在上传中
+  uploader.on('progress', function (files) {
+    console.log('progress...', files)
+  })
+  // 文件上传完成
+  uploader.on('success', function (file) {
+    console.log('success')
+  })
+  // 所有的文件都上传完成
+  uploader.on('alluploaded', function () {
+    console.log('allupload')
+  })
+  // 文件上传失败
+  uploader.on('fail', function (file) {
+    console.log('fail')
   })
   console.log(uploader)
   </script>

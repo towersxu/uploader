@@ -15,22 +15,9 @@ import section from './section'
 import config from '../config'
 
 export default class FileSdk extends Events {
-  constructor (file) {
+  constructor (fileInfo) {
     super()
-    this.fileInfo = {
-      start: 0, // 上传文件当前序号
-      chunkSize: config.chunkSize, // 分片传输
-      size: file.size,
-      name: file.name,
-      chunkLength: Math.ceil(file.size / config.chunkSize),
-      chunkIndex: 0,
-      MD5: '',
-      _file: file,
-      file: '',
-      _uploadSize: 0,
-      _statu: config.UPLOAD_STATUS.INIT,
-      _progress: 0,
-    }
+    this.fileInfo = fileInfo
   }
   /**
    * 开始上传
@@ -73,9 +60,20 @@ export default class FileSdk extends Events {
   _auth (md5) {
     this.fileInfo.MD5 = md5
     this._setFileInfoStatu(config.UPLOAD_STATUS.AUTH)
+    /**
+     * 触发事件
+     */
     this.trigger(config.UPLOAD_STATUS.AUTH)
+    Events.trigger(config.UPLOAD_STATUS.PROGRESS, this.fileInfo)
+    /**
+     * 服务器认证
+     */
     auth(md5, this.fileInfo.size, this.fileInfo.name)
       .then(this._section.bind(this))
+      .catch(e => {
+        this.trigger(config.UPLOAD_STATUS.FAILED)
+        Events.trigger(config.UPLOAD_STATUS.FAILED, this.fileInfo, e)
+      })
   }
   /**
    * 获取文件的一部分
@@ -99,6 +97,7 @@ export default class FileSdk extends Events {
         Math.ceil(this.fileInfo._progress / this.fileInfo.size * 100) + '%',
         this.fileInfo._progress
       )
+      Events.trigger(config.UPLOAD_STATUS.PROGRESS, this.fileInfo)
     })
     uploader.on('success', (data) => {
       if (this.fileInfo.chunkIndex < this.fileInfo.chunkLength - 1) {
@@ -120,7 +119,13 @@ export default class FileSdk extends Events {
           config.UPLOAD_STATUS.SUCCESS,
           data
         )
+        // 触发上传成功，用于给外部uploader对象监听，适用于自定义UI模式
+        Events.trigger(config.UPLOAD_STATUS.SUCCESS, this.fileInfo)
       }
+    })
+    // 分片上传失败
+    uploader.on('error', (data) => {
+      this.trigger(config.UPLOAD_STATUS.FAILED, data)
     })
     uploader.start()
   }

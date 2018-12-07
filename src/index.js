@@ -3,6 +3,7 @@
 import LOG from './logger.js'
 import WebUi from './ui/webui'
 import { setConfig } from './config'
+import Events from './events'
 
 const UI_TYPES = [
   'webui', // 带样式的web端文件上传
@@ -24,30 +25,41 @@ export class Uploader {
    */
   constructor (option) {
     let config = setConfig(option)
-    if (this.validate(config.env, config.btnEl, config.fileListEl)) {
+    if (this._validate(config.env, config.btnEl, config.fileListEl)) {
       this.env = config.env
       this.btnEl = config.btnEl
       this.fileListEl = config.fileListEl
       this.path = config.path
       this.options = config.options
       this.theme = config.theme
-      this.handleUploader()
+      this._handleUploader()
     }
   }
-  handleUploader () {
+  _handleUploader () {
     if (this.env === 'webui') {
       this.uploader = new WebUi(this.btnEl, this.fileListEl, this.theme)
     }
+    this.uploader.on = Events.on
+    this.uploader.trigger = Events.trigger
   }
-  start () {
-    console.log('start')
+  /**
+   * 监听事件
+   */
+  on (key, callback) {
+    Events.on(key, callback)
+  }
+  /**
+   * 触发事件
+   */
+  trigger (key, ...args) {
+    Event.trigger(key, ...arguments)
   }
   /**
    * 检验传入参数是否合法
    * @param {string} env 运行环境
    * @param  {...any} arg 参数
    */
-  validate (env, ...arg) {
+  _validate (env, ...arg) {
     if (UI_TYPES.indexOf(env) === -1) {
       LOG.error('FE1003')
       return
