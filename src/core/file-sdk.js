@@ -68,10 +68,13 @@ export default class FileSdk extends Events {
     /**
      * 服务器认证
      */
-    auth(md5, this.fileInfo.size, this.fileInfo.name)
+    auth(md5, this.fileInfo.size, this.fileInfo.name, this.fileInfo.suffix)
       .then(this._section.bind(this))
       .catch(e => {
+        // todo: 格式化错误对象e的输出
+        Events.trigger('HEADER:ERROR_TEXT', e.message)
         this.trigger(config.UPLOAD_STATUS.FAILED)
+        Events.trigger(config.UPLOAD_STATUS.AUTHERROR, this.fileInfo, e)
         Events.trigger(config.UPLOAD_STATUS.FAILED, this.fileInfo, e)
       })
   }
@@ -128,6 +131,7 @@ export default class FileSdk extends Events {
       this.trigger(config.UPLOAD_STATUS.FAILED, data)
     })
     uploader.start()
+    this.uploader = this.uploader
   }
   upload () {
     // let uploader = ajaxUploader(this.file)

@@ -111,7 +111,7 @@ export default class Header extends UiComponents {
     this.errorInfo = this.patch(this.errorInfo, this.getErrorVNode(text))
     setTimeout(() => {
       this.showError('')
-    }, 3000)
+    }, 5000)
   }
   getErrorVNode (text) {
     return this.h(`span.${this.theme}-header-error`, {

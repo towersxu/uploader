@@ -24,18 +24,26 @@ app.use(function (req, res, next) {
 
 app.post('/preupload', function (req, res) {
   let formData = only(req.body, 'fileFormat fileName hasMd5 md5 size')
+  formData.userId = '17194b0d26494756b853a1eaf4b3e1e1'
+  formData.moduleKey = 'test_key'
+  formData.bussinessId = 'dd9d916551c511e8930c000c29c57b21'
   request.post({
-    url: 'http://127.0.0.1:4000/upload/checkFileMd5',
+    url: 'http://10.4.86.4:4001/upload/checkFileMd5',
     formData: JSON.stringify(formData)
   }, function (err, response, body) {
     if (err) {
       res.json({
+        e: err,
         code: -1,
         message: '无法连接到文件服务器'
       })
       return
     }
-    res.json(JSON.parse(body))
+    try {
+      res.json(JSON.parse(body))
+    } catch (e) {
+      res.send(body)
+    }
   })
 })
 app.use(express.static(path.resolve(__dirname, 'static')))

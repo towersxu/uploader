@@ -57,7 +57,21 @@ export default {
             resolve(res)
           }
           else {
-            reject(xhr.responseText)
+            // todo: 根据后端返回的内容做修改
+            let data = {
+              success: false
+            }
+            if (xhr.responseText) {
+              try {
+                let res = JSON.parse(xhr.responseText)
+                Object.assign(data, res)
+              } catch (e) {
+                data.message = xhr.responseText
+              }
+            } else {
+              data.message = '无法连接文件上传服务'
+            }
+            reject(data)
           }
         }
       }

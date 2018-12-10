@@ -61,7 +61,7 @@ class Uploader extends Events {
         form.append(key, this.data[key])
       }
     })
-    this.xhr = ajax.postFile(config.path, {
+    this.xhr = ajax.postFile(config.uploadPath, {
       data: form,
       progress: (progress, loaded) => {
         if (progress === '100%') {

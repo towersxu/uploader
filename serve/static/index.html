@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
   <title>111</title>
   <link rel="stylesheet" href="./example/example.css">
   <!-- <link rel="stylesheet" href="http://ecstest.ledc.changyan.cn/common-static/js/common/common.navbar.css"> -->
@@ -14,34 +15,9 @@
   <div class="example-list">
     <div id="filelist"></div>
   </div>
-  <div id="flash-el"></div>
-  <script>
-    function cback () {
-      console.log('cssss')
-    }
-    function _makeFlashHTML (opts) {
-      return ('<object id="#id#" classid="clsid:D27CDB6E-AE6D-11cf-96B8-444553540000" width="' + (opts.width || '100%') + '" height="' + (opts.height || '100%') + '">' +
-            '<param name="movie" value="#src#" />' +
-            '<param name="flashvars" value="#flashvars#" />' +
-            '<param name="swliveconnect" value="true" />' +
-            '<param name="allowscriptaccess" value="always" />' +
-            '<param name="allownetworking" value="all" />' +
-            '<param name="menu" value="false" />' +
-            '<param name="wmode" value="#wmode#" />' +
-            '<embed flashvars="#flashvars#" swliveconnect="true" allownetworking="all" allowscriptaccess="always" name="#id#" src="#src#" width="' + (opts.width || '100%') + '" height="' + (opts.height || '100%') + '" menu="false" wmode="transparent" type="application/x-shockwave-flash"></embed>' +
-            '</object>').replace(/#(\w+)#/ig, function (a, name) { return opts[name] })
-
-    }
-    document.getElementById('flash-el').innerHTML = _makeFlashHTML({
-      id: 'flash-el',
-      src: './dist/FileAPI.flash.swf',
-      flashvars: 'callback=cback',
-      wmode: 'opaque'
-    })
-  </script>
   <script src="dist/uploader.js"></script>
   <script>
-  var UPLOADER_PATH = 'http://10.4.86.4:4001/preupload'
+  var UPLOADER_PATH = 'http://localhost:4001/preupload'
   var uploader = new window.Uploader({
     path: UPLOADER_PATH,
     headers: {},
@@ -64,7 +40,7 @@
   })
   // 文件正在上传中
   uploader.on('progress', function (files) {
-    console.log('progress...', files)
+    // console.log('progress...', files)
   })
   // 文件上传完成
   uploader.on('success', function (file) {
@@ -77,6 +53,9 @@
   // 文件上传失败
   uploader.on('fail', function (file) {
     console.log('fail')
+  })
+  uploader.on('error', function (file, msg) {
+    console.log('error', msg)
   })
   console.log(uploader)
   </script>

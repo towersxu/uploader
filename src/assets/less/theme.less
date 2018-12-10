@@ -6,6 +6,7 @@
 @success-color: #67C23A; // Success
 @warning-color: #E6A23C; // Warning
 @info-color: #909399; // Info
+@primary-color: #409EFF; // primary
 // 上传按钮
 .@{theme}-filebutton {
   &-wrapper {
@@ -168,9 +169,12 @@
 
 // 上传过程中，对应步骤的状态
 .@{theme}-status-tips {
-  color: #E5A146;
+  color: @warning-color;
   &.@{theme}-status-auth {
-    color: #409EFF;
+    color: @primary-color;
+  }
+  &.@{theme}-status-error {
+    color: @error-color;
   }
 }
 

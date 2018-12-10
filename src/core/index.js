@@ -20,6 +20,7 @@ export default class FileCore {
       let errorMsg = this._isErrorName(file.name, suffix)
       if (errorMsg) {
         Events.trigger('HEADER:ERROR_TEXT', errorMsg)
+        Events.trigger(config.UPLOAD_STATUS.ERROR, file, errorMsg)
       } else {
         let fileInfo = {
           start: 0, // 上传文件当前序号

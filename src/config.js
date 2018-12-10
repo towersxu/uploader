@@ -7,6 +7,7 @@ let UPLOAD_STATUS = {
   INIT: 'init',
   MD5: 'md5',
   AUTH: 'auth',
+  ERROR: 'error', // 上传出现错误
   AUTHERROR: 'autherror', // 认证失败
   PROGRESS: 'progress', // 上传中
   SUCCESS: 'success', // 上传成功

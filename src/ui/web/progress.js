@@ -72,6 +72,9 @@ class ProgressBar extends UiComponents {
     if (statu === config.UPLOAD_STATUS.WAITING) {
       this.size.setStatus(1, '待上传')
     }
+    if (statu === config.UPLOAD_STATUS.FAILED) {
+      this.size.setStatus(3, '失败')
+    }
     this.ptools.setStatus(statu, data)
   }
   /**
@@ -130,13 +133,19 @@ class FileSizeEl extends UiComponents {
     this.patch(this.p, el)
     this.p = el
   }
+  /**
+   * 
+   * @param {number} type 进度文字提示类型，1表示默认文字题型，2表示默认上传进度提醒, 3表示上传错误。
+   * @param {string} text 提醒文字或者已上传的数量
+   */
   setStatus (type, text) {
     let el
     if (type === 1) {
       el = this.h(`span.${this.theme}-status-tips.${this.theme}-status-auth`, text)
-    }
-    else {
+    } else if (type === 2) {
       el = this.h('span', calcSize(text))
+    } else if (type === 3) {
+      el = this.h(`span.${this.theme}-status-tips.${this.theme}-status-error`, text)
     }
     this.patch(this.p, el)
     this.p = el

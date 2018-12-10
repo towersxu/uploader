@@ -55,6 +55,10 @@ let storage = multer.diskStorage({
 let upload = multer({ storage: storage })
 
 app.post('/upload/fileUpload', upload.single('file'), function (req, res) {
+  // res.status(403).json({
+  //   code: -1,
+  //   message: '上传凭证错误'
+  // })
   let tempFile = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/' + req.body.chunkIndex + '.part')
   let configFile = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/config.json')
   if (fs.existsSync(tempFile)) {

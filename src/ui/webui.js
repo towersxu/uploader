@@ -95,27 +95,37 @@ export default class WebUi extends Render {
   }
   // 根据上传的文件数，初始化文件上传对象
   fileChange (e) {
-    debugger
     // todo: IE9 无法获取file
     if (!config.customUI && !config.showUI) {
       Events.trigger('WEBUI:SHOW_FILESET')
     }
-    this.files = this.files.concat(new FileCore(e.target.files))
-    this.handleFiles()
+    let files = new FileCore(e.target.files)
+    files.forEach((file, idx) => {
+      if (file.show) {
+        let progress = new Progress(this.theme, file.name, file.suffix, file.size, idx)
+        progress.idx = this.files.length + idx
+        if (file._statu === config.UPLOAD_STATUS.INIT) {
+          let fs = FileCore.uploadFile(file)
+          this._exchangeBridge(fs, progress)
+        }
+        file._p = progress
+      }
+    })
+    this.files = this.files.concat(files)
+    this._handleFiles()
     // 重置选择内容，解决无法两次选择同一个文件的问题
     if (this.inputEl && this.inputEl.elm) {
       this.inputEl.elm.value = ''
     }
   }
-  handleFiles () {
+  /**
+   * 选择文件后，处理文件
+   */
+  _handleFiles () {
     let allProgress = []
     this.files.forEach((file, idx) => {
       if (file.show) {
-        if (file._statu === config.UPLOAD_STATUS.INIT) {
-          FileCore.uploadFile(file)
-        }
-        let progress = new Progress(this.theme, file.name, file.suffix, file.size, idx)
-        allProgress.push(progress.getEl())
+        allProgress.push(file._p.getEl())
       }
     })
     // warning: 感觉这种写法好傻，创建一个新对象，比较新对象与之前的对象。在DOM渲染后在将旧对象引用指向新对象，然后回收旧对象。
@@ -123,5 +133,40 @@ export default class WebUi extends Render {
     let newList = this.h(`div.${this.theme}-fileset-list`, allProgress)
     this.patch(this.list, newList)
     this.list = newList
+  }
+  /**
+   * js与UI控件通信
+   * @param {object} fs 上传控件
+   * @param {object} progress 文件上传进度条UI
+   */
+  _exchangeBridge (fs, progress) {
+    fs.on('progress', (data, loaded) => {
+      if (!loaded) loaded = file.size
+      progress.setProgress(data, loaded)
+    })
+    fs.on('success', (data) => {
+      progress.setStatus('success', data)
+    })
+    fs.on('md5', (data) => {
+      progress.setStatus('md5')
+    })
+    fs.on('auth', () => {
+      progress.setStatus('auth')
+    })
+    fs.on('waiting', () => {
+      progress.setStatus('waiting')
+    })
+    fs.on(config.UPLOAD_STATUS.FAILED, () => {
+      console.log('failed...')
+      progress.setStatus(config.UPLOAD_STATUS.FAILED)
+    })
+    progress.on('delete', () => {
+      // 1) 取消上传
+      // 2) 上传上传进度条
+      // 3) 同步修改上传文件对象列表
+      fs.cancel()
+      this.files[progress.idx].show = false
+      this._handleFiles()
+    })
   }
 }
