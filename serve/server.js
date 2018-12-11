@@ -4,6 +4,7 @@ const app = express()
 const request = require('request')
 const bodyParser = require('body-parser')
 const only = require('only')
+const FormData = require('form-data')
 
 app.use(bodyParser.json())       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -27,9 +28,15 @@ app.post('/preupload', function (req, res) {
   formData.userId = '17194b0d26494756b853a1eaf4b3e1e1'
   formData.moduleKey = 'test_key'
   formData.bussinessId = 'dd9d916551c511e8930c000c29c57b21'
-  request.post({
-    url: 'http://10.4.86.4:4001/upload/checkFileMd5',
-    formData: JSON.stringify(formData)
+  request({
+    // url: 'http://10.4.86.4:4000/upload/checkFileMd5',
+    method: 'POST',
+    headers: {
+      "Content-type": "application/json"
+    },
+    url: 'http://10.4.87.35:8080/api-fileupload-svc/?method=upload.checkFileMd5&version=1.0',
+    json: formData
+    // formData: formData
   }, function (err, response, body) {
     if (err) {
       res.json({

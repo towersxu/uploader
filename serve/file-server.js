@@ -8,6 +8,7 @@ const uuid = require('./uuid')
 const bodyParser = require('body-parser')
 const multer = require('multer')
 const concat = require('concat-files')
+const AES = require('crypto-js/aes')
 
 app.use(bodyParser.json())       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -28,16 +29,38 @@ app.use(function (req, res, next) {
 
 app.post('/upload/checkFileMd5', function (req, res) {
   // let data = only(req.body, 'md5 hasMd5 userId moduleKey size bussinessId fileName fileFormat')
-  let uid = uuid()
-  res.json({
-    code: 0,
-    data: [],
-    token: uid
-  })
+  let token
+  // console.log(token)
+  let configFile = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/config.json')
+  if (fs.existsSync(configFile)) {
+    let config = JSON.parse(fs.readFileSync(configFile))
+    token = AES.encrypt(req.body.MD5, config.chunks.length.toString()).toString()
+    if (config.chunks && config.chunks.length === config.chunkSize) {
+      res.json({
+        code: 100,
+        data: config.chunks,
+        token: token
+      })
+    } else {
+      res.json({
+        code: 102,
+        data: config.chunks,
+        token: token
+      })
+    }
+  } else {
+    token = AES.encrypt(req.body.MD5, '0').toString()
+    res.json({
+      code: 0,
+      data: [],
+      token: token
+    })
+  }
 })
 // 处理文件上传
 let storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    // todo: ticket校验
     let dir = path.resolve(__dirname, './uploads/' + req.body.MD5 + '/')
     if (fs.existsSync(dir)) {
       cb(null, dir)
@@ -73,6 +96,7 @@ app.post('/upload/fileUpload', upload.single('file'), function (req, res) {
     }
     // todo: 各种校验
     let chunkIndex = Number(req.body.chunkIndex)
+    let token = AES.encrypt(req.body.MD5, conf.chunks.length.toString()).toString()
     if (conf.chunks.indexOf(chunkIndex) === -1) {
       conf.chunks.push(chunkIndex)
       conf.chunkLength = Number(req.body.chunkLength)
@@ -94,19 +118,21 @@ app.post('/upload/fileUpload', upload.single('file'), function (req, res) {
         } else {
           res.json({
             code: 0,
-            data: conf
+            data: conf,
+            token: token
           })
         }
       })
     } else {
       res.json({
         code: 0,
-        data: conf
+        data: conf,
+        token: token
       })
     }
   } else {
     res.json({
-      code: 0,
+      code: -1,
       data: []
     })
   }
@@ -154,8 +180,6 @@ app.post('/upload', function (req, res) {
   // parse the incoming request containing the form data
   form.parse(req)
 })
-
-
 
 app.listen(4000, function () {
   console.log('serve listen on port 4000')

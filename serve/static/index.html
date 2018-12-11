@@ -21,7 +21,8 @@
   var uploader = new window.Uploader({
     path: UPLOADER_PATH,
     headers: {},
-    uploadPath: 'http://10.4.86.4:4000/upload/fileUpload',
+    // uploadPath: 'http://10.4.86.4:4000/upload/fileUpload',
+    uploadPath: 'http://10.4.87.35:8080/api-fileupload-svc/?method=upload.fileUpload&version=1.0',
     btnEl: document.getElementById('uploader-button'),
     fileListEl: document.getElementById('filelist'),
     env: 'webui', // webui > mobileui > websdk > mobilesdk

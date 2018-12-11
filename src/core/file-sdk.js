@@ -82,16 +82,25 @@ export default class FileSdk extends Events {
    * 获取文件的一部分
    * @param {object} res 认证返回的对象
    */
-  _section () {
+  _section (res) {
+    console.log(res)
+    let ticket = res.token
+    if (!res || !res.token) {
+      this.trigger(config.UPLOAD_STATUS.FAILED)
+      Events.trigger(config.UPLOAD_STATUS.ERROR, this.fileInfo, 'ticket required')
+      return
+    }
+    // todo: 处理当前应该上传那一片
     section(this.fileInfo._file, this.fileInfo.start, this.fileInfo.chunkSize)
       .then((blob) => {
-        this._uploadChunk(blob)
+        this._uploadChunk(blob, ticket)
       })
   }
-  _uploadChunk (blob) {
+  _uploadChunk (blob, ticket) {
     // 上传分片~
     this._setFileInfoStatu(config.UPLOAD_STATUS.PROGRESS)
     this.fileInfo.file = blob
+    this.fileInfo.token = ticket
     let uploader = uploadChunk(this.fileInfo)
     uploader.on('progress', (progress, loaded) => {
       this.fileInfo._progress = this.fileInfo.chunkIndex * this.fileInfo.chunkSize + loaded
@@ -107,7 +116,7 @@ export default class FileSdk extends Events {
         this.fileInfo.start = (this.fileInfo.chunkIndex += 1) * this.fileInfo.chunkSize
         // 如果上传被暂时或者删除了，则不继续上传下一个分片
         if (this.fileInfo._statu === config.UPLOAD_STATUS.PROGRESS) {
-          this._section()
+          this._section(data)
         }
       } else {
         // todo: 如果刚好在上传最后一个分片的过程中暂停
