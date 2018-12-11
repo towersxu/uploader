@@ -14,8 +14,39 @@ let UPLOAD_STATUS = {
   CANCEL: 'cancel', // 取消上传
   PAUSE: 'pause', // 暂停
   FAILED: 'failed', //上传失败
+  ABORT: 'abort', // 终止上传
   WAITING: 'waiting' // 待上传
 }
+
+let FILE_CODE = {
+  /**
+   * 文件上传成功
+   */
+  SUCCESS: 0,
+  /**
+   * 文件已经上传，可以秒传
+   */
+  EXIST: 100,
+  /**
+   * 文件服务器上没有，需要重新上传
+   */
+  UN_EXIST: 101,
+  /**
+   * 文件已部分上传，可以断点续传
+   */
+  PART_EXIST: 102,
+  /**
+   * 业务相关
+   * 无对应学校
+   */
+  ERROR_AUTH: 103,
+  /**
+   * 业务相关
+   * 学校存储空间限制
+   */
+  FORBID_UPLOAD: 104
+}
+
 
 let CONFIG = {
    // 上传服务器地址
@@ -74,7 +105,11 @@ let CONFIG = {
   /**
    * 上传状态
    */
-  UPLOAD_STATUS: UPLOAD_STATUS
+  UPLOAD_STATUS: UPLOAD_STATUS,
+  /**
+   * 文件在服务器的状态
+   */
+  FILE_CODE: FILE_CODE
 }
 
 export function setConfig (conf) {

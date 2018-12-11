@@ -27,9 +27,9 @@ export default class FileCore {
           chunkSize: config.chunkSize, // 分片传输
           size: file.size,
           name: file.name,
-          chunkLength: Math.ceil(file.size / config.chunkSize),
-          chunkIndex: 0,
-          MD5: '',
+          chunks: Math.ceil(file.size / config.chunkSize),
+          chunk: 0,
+          md5: '',
           suffix: suffix,
           _file: file,
           file: '',

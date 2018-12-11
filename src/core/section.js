@@ -11,6 +11,7 @@ export default function (blob, start, length) {
     if (end > blob.size) {
       end = blob.size
     }
+    console.log(start, end)
     var nb = blob.slice(start, end)
     resove(nb)
   })

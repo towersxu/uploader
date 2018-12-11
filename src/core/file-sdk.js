@@ -58,7 +58,7 @@ export default class FileSdk extends Events {
    * @param {string} md5 
    */
   _auth (md5) {
-    this.fileInfo.MD5 = md5
+    this.fileInfo.md5 = md5
     this._setFileInfoStatu(config.UPLOAD_STATUS.AUTH)
     /**
      * 触发事件
@@ -69,7 +69,11 @@ export default class FileSdk extends Events {
      * 服务器认证
      */
     auth(md5, this.fileInfo.size, this.fileInfo.name, this.fileInfo.suffix)
-      .then(this._section.bind(this))
+      .then((res) => {
+        console.log(res)
+        this.fileInfo.token = res.token
+        this._section(res)
+      })
       .catch(e => {
         // todo: 格式化错误对象e的输出
         Events.trigger('HEADER:ERROR_TEXT', e.message)
@@ -83,58 +87,38 @@ export default class FileSdk extends Events {
    * @param {object} res 认证返回的对象
    */
   _section (res) {
-    console.log(res)
-    let ticket = res.token
-    if (!res || !res.token) {
-      this.trigger(config.UPLOAD_STATUS.FAILED)
-      Events.trigger(config.UPLOAD_STATUS.ERROR, this.fileInfo, 'ticket required')
-      return
-    }
+    let ticket = this.fileInfo.token
+    // if (!res || !res.token) {
+    //   this.trigger(config.UPLOAD_STATUS.FAILED)
+    //   Events.trigger(config.UPLOAD_STATUS.ERROR, this.fileInfo, 'ticket required')
+    //   return
+    // }
+    // if (res.code === 100) {
+
+    // }
+    // if (res.data) {
+    //   console.log(res.data)
+    //   this.fileInfo.chunk = 
+    // }
     // todo: 处理当前应该上传那一片
     section(this.fileInfo._file, this.fileInfo.start, this.fileInfo.chunkSize)
       .then((blob) => {
         this._uploadChunk(blob, ticket)
       })
   }
+  /**
+   * 上传分片
+   * @param {blob} blob 二进制文件
+   * @param {*} ticket 
+   */
   _uploadChunk (blob, ticket) {
     // 上传分片~
     this._setFileInfoStatu(config.UPLOAD_STATUS.PROGRESS)
     this.fileInfo.file = blob
     this.fileInfo.token = ticket
     let uploader = uploadChunk(this.fileInfo)
-    uploader.on('progress', (progress, loaded) => {
-      this.fileInfo._progress = this.fileInfo.chunkIndex * this.fileInfo.chunkSize + loaded
-      this.trigger(
-        config.UPLOAD_STATUS.PROGRESS,
-        Math.ceil(this.fileInfo._progress / this.fileInfo.size * 100) + '%',
-        this.fileInfo._progress
-      )
-      Events.trigger(config.UPLOAD_STATUS.PROGRESS, this.fileInfo)
-    })
-    uploader.on('success', (data) => {
-      if (this.fileInfo.chunkIndex < this.fileInfo.chunkLength - 1) {
-        this.fileInfo.start = (this.fileInfo.chunkIndex += 1) * this.fileInfo.chunkSize
-        // 如果上传被暂时或者删除了，则不继续上传下一个分片
-        if (this.fileInfo._statu === config.UPLOAD_STATUS.PROGRESS) {
-          this._section(data)
-        }
-      } else {
-        // todo: 如果刚好在上传最后一个分片的过程中暂停
-        // todo: 如果刚好在上传最后一个分片的过程中删除
-        this._setFileInfoStatu(config.UPLOAD_STATUS.SUCCESS)
-        this.trigger(
-          config.UPLOAD_STATUS.PROGRESS,
-          '100%',
-          this.fileInfo.size
-        )
-        this.trigger(
-          config.UPLOAD_STATUS.SUCCESS,
-          data
-        )
-        // 触发上传成功，用于给外部uploader对象监听，适用于自定义UI模式
-        Events.trigger(config.UPLOAD_STATUS.SUCCESS, this.fileInfo)
-      }
-    })
+    uploader.on('progress', this._handleProgress.bind(this))
+    uploader.on('success', this._handleSuccess.bind(this))
     // 分片上传失败
     uploader.on('error', (data) => {
       this.trigger(config.UPLOAD_STATUS.FAILED, data)
@@ -142,22 +126,49 @@ export default class FileSdk extends Events {
     uploader.start()
     this.uploader = this.uploader
   }
-  upload () {
-    // let uploader = ajaxUploader(this.file)
-    // uploader.on('progress', (data, loaded) => {
-    //   this.statu = 'progress'
-    //   this.trigger('progress', data, loaded)
-    // })
-    // uploader.on('success', (data) => {
-    //   this.statu = 'success'
-    //   this.trigger('success', data)
-    // })
-    // uploader.on('abort', (data) => {
-    //   this.statu = 'abort'
-    //   this.trigger('abort', data)
-    // })
-    // this.uploader = uploader
+  /**
+   * 上传中，进度处理
+   * @param {string} progress 上传进度百分比
+   * @param {number} loaded 已上传数量
+   */
+  _handleProgress (progress, loaded) {
+    this.fileInfo._progress = this.fileInfo.chunk * this.fileInfo.chunkSize + loaded
+    this.trigger(
+      config.UPLOAD_STATUS.PROGRESS,
+      Math.ceil(this.fileInfo._progress / this.fileInfo.size * 100) + '%',
+      this.fileInfo._progress
+    )
+    Events.trigger(config.UPLOAD_STATUS.PROGRESS, this.fileInfo)
   }
+  /**
+   * @param {object} data 分片上传后返回的数据
+   */
+  _handleSuccess (data) {
+    if (this.fileInfo.chunk < this.fileInfo.chunks - 1) {
+      // 如果上传被暂时或者删除了，则不继续上传下一个分片
+      if (this.fileInfo._statu === config.UPLOAD_STATUS.PROGRESS) {
+        this.fileInfo.start = (this.fileInfo.chunk += 1) * this.fileInfo.chunkSize
+        this._section(data)
+      }
+    } else {
+      this._setFileInfoStatu(config.UPLOAD_STATUS.SUCCESS)
+      this.trigger(
+        config.UPLOAD_STATUS.PROGRESS,
+        '100%',
+        this.fileInfo.size
+      )
+      this.trigger(
+        config.UPLOAD_STATUS.SUCCESS,
+        data
+      )
+      // 触发上传成功，用于给外部uploader对象监听，适用于自定义UI模式
+      Events.trigger(config.UPLOAD_STATUS.SUCCESS, this.fileInfo)
+    }
+  }
+  /**
+   * 获取上传实例
+   * @return uploader
+   */
   getUploader () {
     return this.uploader
   }

@@ -1,3 +1,7 @@
+/**
+ * web界面模块
+ * @module WebUi
+ */
 import Render from '../render'
 import FileSdk from '../core/file-sdk'
 import Progress from './web/progress'
@@ -141,6 +145,7 @@ export default class WebUi extends Render {
    */
   _exchangeBridge (fs, progress) {
     fs.on('progress', (data, loaded) => {
+      // FIXME: file
       if (!loaded) loaded = file.size
       progress.setProgress(data, loaded)
     })
@@ -157,7 +162,6 @@ export default class WebUi extends Render {
       progress.setStatus('waiting')
     })
     fs.on(config.UPLOAD_STATUS.FAILED, () => {
-      console.log('failed...')
       progress.setStatus(config.UPLOAD_STATUS.FAILED)
     })
     progress.on('delete', () => {
